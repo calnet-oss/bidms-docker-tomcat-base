@@ -1,8 +1,10 @@
 ## Purpose
 
 This [Docker](http://www.docker.com/) image runs a
-[Tomcat](http://tomcat.apache.org/) application server and exposes the https
-port on 8040.
+[Tomcat](http://tomcat.apache.org/) application server and exposes several
+https ports that serve different groups of applications.  There's multiple
+ports for different web applications to allow for flexibility with firewall
+rules.
 
 The author does not currently publish the image in any public Docker
 repository but a script, described below, is provided to easily create your
@@ -17,13 +19,18 @@ Dockerfile, is licensed under the [BSD two-clause license](LICENSE.txt).
 
 Copy `config.env.template` to `config.env` and edit to set config values.
 
-Create `imageFiles/tmp_passwords/tomcat_manager_pw` file and set a Tomcat
-manager password, which allows you to authentication into the Tomcat manager
-app.
+Create the `imageFiles/tmp_passwords/tomcat_manager_pw` file and set a
+Tomcat manager password, which allows you to authenticate into the Tomcat
+manager web UI application.  Also create the
+`imageFiles/tmp_passwords/tomcat_manager-script_pw` file and set a Tomcat
+manager-script password, which allows you to authenticate into the Tomcat
+manager web endpoint for deploying and undeploying applications via build
+tools like Gradle or by using a continuous integration system to deploy.
 
-Make sure it's only readable by the owner:
+Make sure they are only readable by the owner:
 ```
-chmod 600 imageFiles/tmp_passwords/tomcat_manager_pw
+chmod 600 imageFiles/tmp_passwords/tomcat_manager_pw \
+  imageFiles/tmp_passwords/tomcat_manager-script_pw
 ```
 
 This image depends on the the base BIDMS Debian Docker image from the
@@ -52,14 +59,8 @@ Or to run the container detached, in the background:
 ./detachedRunContainer.sh
 ```
 
-If everything goes smoothly, the container should expose port 8040, the
-Tomcat https port.  This port is redirected to a port on the host, where the
-host port number is specified in `config.env` as `LOCAL_TOMCAT_PORT`.
-
-You can then use your favorite web browser to connect to the Tomcat manager
-app, which should be running at
-(https://localhost:8040/manager/html/)[https://localhost:8040/manager/html/]
-if you have `LOCAL_TOMCAT_PORT` configured as port 8040 in `config.env`.
+If everything goes smoothly, the container should expose several https
+ports.
 
 If running interactively, you can exit the container by exiting the bash
 shell.  If running in detached mode, you can stop the container with:
@@ -75,6 +76,58 @@ To list the running containers on the host:
 ```
 docker ps
 ```
+
+## Tomcat Ports
+
+The container exposes several https ports.  These ports are redirected to
+ports on the host, where the host port numbers are specified in
+`config.env`.  
+
+In this context, "front-end" means an user-facing application or an
+application that exposes externally available REST endpoints.  "Externally
+available" means available to users or computers outside the BIDMS stack of
+services.  It does not mean available to everyone.  "Back-end" means an
+application that isn't user-facing or externally available: i.e., it's
+internal to the BIDMS stack and does not need to be accessed by anything
+other than BIDMS software.
+  * LOCAL_BIDMS_USER_FRONTEND_TOMCAT_PORT (default: 8340)
+    * BIDMS user-facing front-end web applications.
+  * LOCAL_BIDMS_ADMIN_FRONTEND_TOMCAT_PORT (default: 8341)
+    * BIDMS administrator-facing front-end web applications.
+    * Should be protected, at least, by firewall rules that limit access to
+      your organization's network, assuming your administrators belong to
+      your organization.
+  * LOCAL_BIDMS_RESTAPI_FRONTEND_TOMCAT_PORT (default: 8342)
+    * BIDMS externally available REST APIs.
+    * This doesn't mean all the services running within these applications
+      should be externally accessible.  Rather, it means the application has
+      at least one service that should be externally accessible and
+      therefore needs looser firewall restrictions in order to expose the
+      service.  At a minimum, you should limit access to these services to
+      within your organization's network.
+  * LOCAL_BIDMS_BACKEND_TOMCAT_PORT (default: 8343)
+    * BIDMS back-end web applications.
+    * Should be tightly protected by at least one firewall that denies
+      access to just about everything except maybe other backend BIDMS
+      servers operating within a BIDMS backend cluster.
+  * LOCAL_AMQ_TOMCAT_PORT (default: 8344)
+    * ActiveMQ
+    * Should be tightly protected by at least one firewall that denies
+      access to just about everything except maybe other backend BIDMS
+      servers operating within a BIDMS backend cluster.
+
+There are opportunities to split this further if you need further
+flexibility with setting even finer-grained firewall rules for the various
+applications.  At the finest level, you could have a port number for each
+web application.
+
+Although there shouldn't be a reason, if you wish to connect to the Tomcat
+manager web UI application, visit
+```
+https://localhost:PORT/manager/html/)[https://localhost:8040/manager/html/
+```
+Replace PORT with the port number.  There is a manager app running on each
+port.
 
 ## Tomcat File Persistence
 

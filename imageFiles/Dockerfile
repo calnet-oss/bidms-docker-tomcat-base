@@ -85,15 +85,48 @@ RUN mkdir /var/lib/tomcat${TOMCAT_VERSION}/certs \
 # group readable.
 RUN chmod 640 /etc/tomcat${TOMCAT_VERSION}/server.xml
 
-# Enable Tomcat TLS on port 8443 by adding a SSL connector within <Service/>
-RUN sed -f /tmp/tmp_tomcat/service_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml
-
 # Add the JNDI resource for the BIDMS database connection pool
 RUN sed -f /tmp/tmp_tomcat/globalnaming_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml
 
+# Add the different TLS port numbers, each pointing to a different webapps
+# base directory.  This gives more flexibility to protect applications
+# running on different ports differently, such as with a firewall.
+RUN mkdir \
+      /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-user-frontend \
+      /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-admin-frontend \
+      /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-restapi-frontend \
+      /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-backend \
+      /var/lib/tomcat${TOMCAT_VERSION}/webapps-amq \
+  && chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} \
+       /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-user-frontend \
+       /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-admin-frontend \
+       /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-restapi-frontend \
+       /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-backend \
+       /var/lib/tomcat${TOMCAT_VERSION}/webapps-amq \
+  && ln -fs /usr/share/tomcat8-admin/manager \
+       /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-user-frontend/manager \
+  && ln -fs /usr/share/tomcat8-admin/manager \
+       /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-admin-frontend/manager \
+  && ln -fs /usr/share/tomcat8-admin/manager \
+       /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-restapi-frontend/manager \
+  && ln -fs /usr/share/tomcat8-admin/manager \
+       /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-backend/manager \
+  && ln -fs /usr/share/tomcat8-admin/manager \
+       /var/lib/tomcat${TOMCAT_VERSION}/webapps-amq/manager \
+  && sed -f /tmp/tmp_tomcat/server_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml
+
 RUN rm -rf /core /tmp/tmp_passwords /tmp/tmp_tomcat
 
-EXPOSE 8443
+# webapps-bidms-user-frontend
+EXPOSE 8540
+# webapps-bidms-admin-frontend
+EXPOSE 8541
+# webapps-bidms-restapi-frontend
+EXPOSE 8542
+# webapps-bidms-backend
+EXPOSE 8543
+# webapps-amq
+EXPOSE 8544
 
 COPY etc/container/ /etc/container/
 ENTRYPOINT ["/etc/container/tomcat-entrypoint.sh", "interactive"]

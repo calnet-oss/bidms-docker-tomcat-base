@@ -1,9 +1,0 @@
-
-    <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
-               maxThreads="500" SSLEnabled="true">
-        <SSLHostConfig>
-            <Certificate certificateKeystoreFile="/var/lib/tomcat8/certs/tomcat.jks"
-                         type="RSA" />
-        </SSLHostConfig>
-    </Connector>
-  </Service>
