@@ -33,7 +33,7 @@ ARG TOMCAT_VERSION=8
 
 # Installing a specific version of libservlet shouldn't be necessary as the
 # servlet depdendencies should be attached to the tomcat package, but it
-# appears the Debian stretch tomcat8 package is missing this dependency.
+# appears the Debian stretch tomcat package is missing this dependency.
 RUN set -x \
   && export DEBIAN_FRONTEND=noninteractive \
   && apt-get update \
@@ -56,6 +56,7 @@ RUN rm -rf /var/lib/tomcat${TOMCAT_VERSION}/logs /var/log/tomcat${TOMCAT_VERSION
     && ln -fs /var/lib/tomcat${TOMCAT_VERSION}/work /var/cache/tomcat${TOMCAT_VERSION}
 
 COPY tmp_passwords/ /tmp/tmp_passwords/
+COPY tmp_tomcat/ /tmp/tmp_tomcat/
 
 # Add tomcat manager and manager-script users.
 # manager is for the HTML GUI and manager-script is for deployment of apps.
@@ -79,10 +80,16 @@ RUN mkdir /var/lib/tomcat${TOMCAT_VERSION}/certs \
   && chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} \
        /var/lib/tomcat${TOMCAT_VERSION}/certs/tomcat.jks
 
-# Enable Tomcat TLS on port 8443 by adding a SSL connector
-RUN sed -i 's#  </Service>#\n    <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"\n               maxThreads="500" SSLEnabled="true">\n        <SSLHostConfig>\n            <Certificate certificateKeystoreFile="/var/lib/tomcat8/certs/tomcat.jks"\n                         type="RSA" />\n        </SSLHostConfig>\n    </Connector>\n  </Service>#' /etc/tomcat8/server.xml
+# Only user-readable because of the JNDI secrets in server.xml
+RUN chmod 600 /etc/tomcat${TOMCAT_VERSION}/server.xml
 
-RUN rm -rf /core /tmp/tmp_passwords
+# Enable Tomcat TLS on port 8443 by adding a SSL connector within <Service/>
+RUN sed -f /tmp/tmp_tomcat/service_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml
+
+# Add the JNDI resource for the BIDMS database connection pool
+RUN sed -f /tmp/tmp_tomcat/globalnaming_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml
+
+RUN rm -rf /core /tmp/tmp_passwords /tmp/tmp_tomcat
 
 EXPOSE 8443
 

@@ -1,0 +1,13 @@
+
+    <!-- JNDI database pool for connections to the BIDMS database -->
+    <!--
+    <Resource name="jdbc/bidmsDB" auth="Container"
+              type="javax.sql.DataSource"
+              maxTotal="500"
+              maxIdle="30"
+              maxWaitMillis="10000"
+              username="changethis" password="changethis"
+              driverClassName="postgresqldriver"
+              url="postgresqlurl"/>
+    -->
+  </GlobalNamingResources>
