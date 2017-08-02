@@ -80,8 +80,10 @@ RUN mkdir /var/lib/tomcat${TOMCAT_VERSION}/certs \
   && chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} \
        /var/lib/tomcat${TOMCAT_VERSION}/certs/tomcat.jks
 
-# Only user-readable because of the JNDI secrets in server.xml
-RUN chmod 600 /etc/tomcat${TOMCAT_VERSION}/server.xml
+# Only user and group readable because of the JNDI secrets in server.xml.
+# This fine is installed as root and tomcat is the group, so it has to be
+# group readable.
+RUN chmod 640 /etc/tomcat${TOMCAT_VERSION}/server.xml
 
 # Enable Tomcat TLS on port 8443 by adding a SSL connector within <Service/>
 RUN sed -f /tmp/tmp_tomcat/service_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml
