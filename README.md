@@ -1,7 +1,7 @@
 ## Purpose
 
 This [Docker](http://www.docker.com/) image runs a
-[Tomcat](http://tomcat.apache.org/) application server and exposes the http
+[Tomcat](http://tomcat.apache.org/) application server and exposes the https
 port on 8040.
 
 The author does not currently publish the image in any public Docker
@@ -53,11 +53,13 @@ Or to run the container detached, in the background:
 ```
 
 If everything goes smoothly, the container should expose port 8040, the
-Tomcat http port.  This port is redirected to a port on the host, where the
+Tomcat https port.  This port is redirected to a port on the host, where the
 host port number is specified in `config.env` as `LOCAL_TOMCAT_PORT`.
 
 You can then use your favorite web browser to connect to the Tomcat manager
-app.
+app, which should be running at
+(https://localhost:8040/manager/html/)[https://localhost:8040/manager/html/]
+if you have `LOCAL_TOMCAT_PORT` configured as port 8040 in `config.env`.
 
 If running interactively, you can exit the container by exiting the bash
 shell.  If running in detached mode, you can stop the container with:

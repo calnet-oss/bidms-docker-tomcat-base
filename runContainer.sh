@@ -86,7 +86,7 @@ fi
 # and SYS_PTRACE needed for /proc/<pid>/exe.
 docker run $INTERACTIVE_PARAMS --rm --name "bidms-tomcat" \
   $MOUNTPARAMS \
-  -p $LOCAL_TOMCAT_PORT:8080 \
+  -p $LOCAL_TOMCAT_PORT:8443 \
   --cap-add=SYS_PTRACE \
   $* \
   bidms/tomcat:latest \

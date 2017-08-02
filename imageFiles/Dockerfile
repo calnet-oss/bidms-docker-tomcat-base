@@ -55,26 +55,36 @@ RUN rm -rf /var/lib/tomcat${TOMCAT_VERSION}/logs /var/log/tomcat${TOMCAT_VERSION
     && ln -fs /var/lib/tomcat${TOMCAT_VERSION}/logs /var/log/tomcat${TOMCAT_VERSION} \
     && ln -fs /var/lib/tomcat${TOMCAT_VERSION}/work /var/cache/tomcat${TOMCAT_VERSION}
 
-# There's a problem with the Debian stretch tomcat package where the
-# tomcat user does not have permission to create the PID file in /var/run,
-# so we have to create a separate run directory owned by the tomcat user and
-# force the start-up script to use it.
-#RUN mkdir /var/run/tomcat${TOMCAT_VERSION} \
-#  && chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} /var/run/tomcat${TOMCAT_VERSION} \
-#  && sed -i "s#CATALINA_PID=\"/var/run/\$NAME.pid\"#CATALINA_PID=\"/var/run/tomcat${TOMCAT_VERSION}/\$NAME.pid\"#" /etc/init.d/tomcat8
-
 COPY tmp_passwords/ /tmp/tmp_passwords/
 
-# Add tomcat manager user
-RUN sed -i 's/<\/tomcat-users>/  <role rolename="manager"\/>\n  <role rolename="manager-gui"\/>\n  <role rolename="manager-script"\/>\n  <role rolename="manager-jmx"\/>\n  <role rolename="manager-status"\/>\n/' /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
+# Add tomcat manager and manager-script users.
+# manager is for the HTML GUI and manager-script is for deployment of apps.
+RUN sed -i 's/<\/tomcat-users>/  <role rolename="manager-gui"\/>\n  <role rolename="manager-script"\/>\n  <role rolename="manager-jmx"\/>\n  <role rolename="manager-status"\/>\n  <role rolename="admin-gui"\/>\n  <role rolename="admin-script"\/>\n/' /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
   && echo -n '  <user username="manager" password="' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
   && cat /tmp/tmp_passwords/tomcat_manager_pw >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
-  && echo '" roles="manager"/>' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
+  && echo '" roles="manager-gui"/>' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
+  && echo -n '  <user username="manager-script" password="' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
+  && cat /tmp/tmp_passwords/tomcat_manager-script_pw >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
+  && echo '" roles="manager-script"/>' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
   && echo '</tomcat-users>' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml
+
+# Generate a self-signed key pair for TLS
+RUN mkdir /var/lib/tomcat${TOMCAT_VERSION}/certs \
+  && keytool -genkey -alias tomcat -keyalg RSA -keysize 4096 \
+       -validity 10000 \
+       -storepass "changeit" -keypass "changeit" \
+       -dname "CN=localhost,OU=BIDMS Tomcat Docker Dev" \
+       -keystore /var/lib/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
+  && chmod 600 /var/lib/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
+  && chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} \
+       /var/lib/tomcat${TOMCAT_VERSION}/certs/tomcat.jks
+
+# Enable Tomcat TLS on port 8443 by adding a SSL connector
+RUN sed -i 's#  </Service>#\n    <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"\n               maxThreads="500" SSLEnabled="true">\n        <SSLHostConfig>\n            <Certificate certificateKeystoreFile="/var/lib/tomcat8/certs/tomcat.jks"\n                         type="RSA" />\n        </SSLHostConfig>\n    </Connector>\n  </Service>#' /etc/tomcat8/server.xml
 
 RUN rm -rf /core /tmp/tmp_passwords
 
-EXPOSE 8080
+EXPOSE 8443
 
 COPY etc/container/ /etc/container/
 ENTRYPOINT ["/etc/container/tomcat-entrypoint.sh", "interactive"]
