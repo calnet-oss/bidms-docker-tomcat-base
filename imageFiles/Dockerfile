@@ -69,7 +69,7 @@ RUN sed -i 's/<\/tomcat-users>/  <role rolename="manager-gui"\/>\n  <role rolena
   && echo '" roles="manager-script"/>' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
   && echo '</tomcat-users>' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml
 
-# Generate a self-signed key pair for TLS
+# Copy the keystore for TLS
 RUN mkdir /etc/tomcat${TOMCAT_VERSION}/certs
 COPY tmp_tomcat/tomcat.jks /etc/tomcat${TOMCAT_VERSION}/certs
 COPY tmp_tomcat/tomcat_pubkey.pem /etc/tomcat${TOMCAT_VERSION}/certs
