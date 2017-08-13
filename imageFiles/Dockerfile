@@ -70,15 +70,17 @@ RUN sed -i 's/<\/tomcat-users>/  <role rolename="manager-gui"\/>\n  <role rolena
   && echo '</tomcat-users>' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml
 
 # Generate a self-signed key pair for TLS
-RUN mkdir /var/lib/tomcat${TOMCAT_VERSION}/certs \
+RUN set -x \
+  && mkdir /etc/tomcat${TOMCAT_VERSION}/certs \
+  && echo "Generating key.  This can take a few seconds." \
   && keytool -genkey -alias tomcat -keyalg RSA -keysize 4096 \
        -validity 10000 \
        -storepass "changeit" -keypass "changeit" \
-       -dname "CN=localhost,OU=BIDMS Tomcat Docker Dev" \
-       -keystore /var/lib/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
-  && chmod 600 /var/lib/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
+       -dname "CN=bidms-tomcat,OU=BIDMS Tomcat Docker Dev" \
+       -keystore /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
+  && chmod 600 /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
   && chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} \
-       /var/lib/tomcat${TOMCAT_VERSION}/certs/tomcat.jks
+       /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks
 
 # Only user and group readable because of the JNDI secrets in server.xml.
 # This fine is installed as root and tomcat is the group, so it has to be
@@ -91,29 +93,42 @@ RUN sed -f /tmp/tmp_tomcat/globalnaming_objects.sed -i /etc/tomcat${TOMCAT_VERSI
 # Add the different TLS port numbers, each pointing to a different webapps
 # base directory.  This gives more flexibility to protect applications
 # running on different ports differently, such as with a firewall.
-RUN mkdir \
-      /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-user-frontend \
-      /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-admin-frontend \
-      /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-restapi-frontend \
-      /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-backend \
-      /var/lib/tomcat${TOMCAT_VERSION}/webapps-amq \
+RUN mkdir -p /usr/local/tomcat/webapps \
+  && mkdir \
+       /usr/local/tomcat/webapps/bidms-user-frontend \
+       /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsUserFrontend \
+       /usr/local/tomcat/webapps/bidms-admin-frontend \
+       /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsAdminFrontend \
+       /usr/local/tomcat/webapps/bidms-restapi-frontend \
+       /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsRestapiFrontend \
+       /usr/local/tomcat/webapps/bidms-backend \
+       /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsBackend \
+       /usr/local/tomcat/webapps/amq \
+       /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsAMQ \
   && chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} \
-       /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-user-frontend \
-       /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-admin-frontend \
-       /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-restapi-frontend \
-       /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-backend \
-       /var/lib/tomcat${TOMCAT_VERSION}/webapps-amq \
-  && ln -fs /usr/share/tomcat8-admin/manager \
-       /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-user-frontend/manager \
-  && ln -fs /usr/share/tomcat8-admin/manager \
-       /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-admin-frontend/manager \
-  && ln -fs /usr/share/tomcat8-admin/manager \
-       /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-restapi-frontend/manager \
-  && ln -fs /usr/share/tomcat8-admin/manager \
-       /var/lib/tomcat${TOMCAT_VERSION}/webapps-bidms-backend/manager \
-  && ln -fs /usr/share/tomcat8-admin/manager \
-       /var/lib/tomcat${TOMCAT_VERSION}/webapps-amq/manager \
+       /usr/local/tomcat/webapps/bidms-user-frontend \
+       /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsUserFrontend \
+       /usr/local/tomcat/webapps/bidms-admin-frontend \
+       /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsAdminFrontend \
+       /usr/local/tomcat/webapps/bidms-restapi-frontend \
+       /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsRestapiFrontend \
+       /usr/local/tomcat/webapps/bidms-backend \
+       /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsBackend \
+       /usr/local/tomcat/webapps/amq \
+       /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsAMQ \
+  && ln -fs /usr/share/tomcat${TOMCAT_VERSION}-admin/manager \
+       /usr/local/tomcat/webapps/bidms-user-frontend/manager \
+  && ln -fs /usr/share/tomcat${TOMCAT_VERSION}-admin/manager \
+       /usr/local/tomcat/webapps/bidms-admin-frontend/manager \
+  && ln -fs /usr/share/tomcat${TOMCAT_VERSION}-admin/manager \
+       /usr/local/tomcat/webapps/bidms-restapi-frontend/manager \
+  && ln -fs /usr/share/tomcat${TOMCAT_VERSION}-admin/manager \
+       /usr/local/tomcat/webapps/bidms-backend/manager \
+  && ln -fs /usr/share/tomcat${TOMCAT_VERSION}-admin/manager \
+       /usr/local/tomcat/webapps/amq/manager \
   && sed -f /tmp/tmp_tomcat/server_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml
+
+RUN echo "JAVA_OPTS=\"\$JAVA_OPTS -Djava.net.preferIPv4Stack=true\"" >> /etc/default/tomcat${TOMCAT_VERSION}
 
 RUN rm -rf /core /tmp/tmp_passwords /tmp/tmp_tomcat
 

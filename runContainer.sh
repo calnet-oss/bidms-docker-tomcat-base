@@ -57,6 +57,14 @@ fi
 echo "Using config values from $CONFIG_FILE"
 . $CONFIG_FILE || check_exit
 
+if [ ! -z "$NETWORK" ]; then
+  echo "NETWORK=$NETWORK"
+  NETWORKPARAMS+="--network $NETWORK "
+else
+  echo "ERROR: Required NETWORK value missing from $CONFIG_FILE"
+  exit 1
+fi
+
 if [ ! -z "$LOCAL_BIDMS_USER_FRONTEND_TOMCAT_PORT" ]; then
   echo "LOCAL_BIDMS_USER_FRONTEND_TOMCAT_PORT=$LOCAL_BIDMS_USER_FRONTEND_TOMCAT_PORT"
 else
@@ -109,6 +117,7 @@ fi
 # and SYS_PTRACE needed for /proc/<pid>/exe.
 docker run $INTERACTIVE_PARAMS --rm --name "bidms-tomcat" \
   $MOUNTPARAMS \
+  $NETWORKPARAMS \
   -p $LOCAL_BIDMS_USER_FRONTEND_TOMCAT_PORT:8540 \
   -p $LOCAL_BIDMS_ADMIN_FRONTEND_TOMCAT_PORT:8541 \
   -p $LOCAL_BIDMS_RESTAPI_FRONTEND_TOMCAT_PORT:8542 \
