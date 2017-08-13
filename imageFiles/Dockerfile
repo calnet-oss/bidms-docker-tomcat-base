@@ -70,17 +70,13 @@ RUN sed -i 's/<\/tomcat-users>/  <role rolename="manager-gui"\/>\n  <role rolena
   && echo '</tomcat-users>' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml
 
 # Generate a self-signed key pair for TLS
-RUN set -x \
-  && mkdir /etc/tomcat${TOMCAT_VERSION}/certs \
-  && echo "Generating key.  This can take a few seconds." \
-  && keytool -genkey -alias tomcat -keyalg RSA -keysize 4096 \
-       -validity 10000 \
-       -storepass "changeit" -keypass "changeit" \
-       -dname "CN=bidms-tomcat,OU=BIDMS Tomcat Docker Dev" \
-       -keystore /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
-  && chmod 600 /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
+RUN mkdir /etc/tomcat${TOMCAT_VERSION}/certs
+COPY tmp_tomcat/tomcat.jks /etc/tomcat${TOMCAT_VERSION}/certs
+COPY tmp_tomcat/tomcat_pubkey.pem /etc/tomcat${TOMCAT_VERSION}/certs
+RUN chmod 600 /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
   && chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} \
-       /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks
+       /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
+       /etc/tomcat${TOMCAT_VERSION}/certs/tomcat_pubkey.pem
 
 # Only user and group readable because of the JNDI secrets in server.xml.
 # This fine is installed as root and tomcat is the group, so it has to be

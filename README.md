@@ -33,6 +33,15 @@ chmod 600 imageFiles/tmp_passwords/tomcat_manager_pw \
   imageFiles/tmp_passwords/tomcat_manager-script_pw
 ```
 
+Generate the key pair that Tomcat will use for TLS:
+```
+./generateTLSCert.sh
+```
+
+Two files are generated:
+* `imageFiles/tmp_tomcat/tomcat.jks` - The Java keystore used by Tomcat.
+* `imageFiles/tmp_tomcat/tomcat_pubkey.pem` - Tomcat's TLS public key.
+
 This image depends on the the base BIDMS Debian Docker image from the
 [bidms-docker-debian-base](http://www.github.com/calnet-oss/bidms-docker-debian-base)
 project.  If you don't have that image built yet, you'll need that first.
