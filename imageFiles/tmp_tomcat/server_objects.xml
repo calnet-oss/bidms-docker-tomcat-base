@@ -3,12 +3,22 @@
   <Service name="CatalinaBidmsUserFrontend">
     <Engine name="CatalinaBidmsUserFrontend"
             defaultHost="localhost-bidms-user-frontend">
-      <Host name="localhost-bidms-user-frontend" appBase="/usr/local/tomcat/webapps/bidms-user-frontend"
+      <Realm className="org.apache.catalina.realm.LockOutRealm">
+        <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+               resourceName="UserDatabase"/>
+      </Realm>
+      <Host name="localhost-bidms-user-frontend"
+            appBase="/usr/local/tomcat/webapps/bidms-user-frontend"
             unpackWARs="true" autoDeploy="true">
         <Valve className="org.apache.catalina.valves.AccessLogValve"
                directory="logs"
                prefix="bidms-user-frontend_access_log" suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+        <Context path="/manager" privileged="true" antiResourceLocking="false"
+                 docBase="manager">
+          <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+                 allow="127\.0\.0\.1|10\.244\.\d+.\d+" />
+        </Context>
       </Host>
     </Engine>
 
@@ -26,12 +36,22 @@
   <Service name="CatalinaBidmsAdminFrontend">
     <Engine name="CatalinaBidmsAdminFrontend"
             defaultHost="localhost-bidms-admin-frontend">
-      <Host name="localhost-bidms-admin-frontend" appBase="/usr/local/tomcat/webapps/bidms-admin-frontend"
+      <Realm className="org.apache.catalina.realm.LockOutRealm">
+        <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+               resourceName="UserDatabase"/>
+      </Realm>
+      <Host name="localhost-bidms-admin-frontend"
+            appBase="/usr/local/tomcat/webapps/bidms-admin-frontend"
             unpackWARs="true" autoDeploy="true">
         <Valve className="org.apache.catalina.valves.AccessLogValve"
                directory="logs"
                prefix="bidms-admin-frontend_access_log" suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+        <Context path="/manager" privileged="true" antiResourceLocking="false"
+                 docBase="manager">
+          <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+                 allow="127\.0\.0\.1|10\.244\.\d+.\d+" />
+        </Context>
       </Host>
     </Engine>
 
@@ -49,12 +69,22 @@
   <Service name="CatalinaBidmsRestapiFrontend">
     <Engine name="CatalinaBidmsRestapiFrontend"
             defaultHost="localhost-bidms-restapi-frontend">
-      <Host name="localhost-bidms-restapi-frontend" appBase="/usr/local/tomcat/webapps/bidms-restapi-frontend"
+      <Realm className="org.apache.catalina.realm.LockOutRealm">
+        <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+               resourceName="UserDatabase"/>
+      </Realm>
+      <Host name="localhost-bidms-restapi-frontend"
+            appBase="/usr/local/tomcat/webapps/bidms-restapi-frontend"
             unpackWARs="true" autoDeploy="true">
         <Valve className="org.apache.catalina.valves.AccessLogValve"
                directory="logs"
                prefix="bidms-restapi-frontend_access_log" suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+        <Context path="/manager" privileged="true" antiResourceLocking="false"
+                 docBase="manager">
+          <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+                 allow="127\.0\.0\.1|10\.244\.\d+.\d+" />
+        </Context>
       </Host>
     </Engine>
 
@@ -72,12 +102,22 @@
   <Service name="CatalinaBidmsBackend">
     <Engine name="CatalinaBidmsBackend"
             defaultHost="localhost-bidms-backend">
-      <Host name="localhost-bidms-backend" appBase="/usr/local/tomcat/webapps/bidms-backend"
+      <Realm className="org.apache.catalina.realm.LockOutRealm">
+        <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+               resourceName="UserDatabase"/>
+      </Realm>
+      <Host name="localhost-bidms-backend"
+            appBase="/usr/local/tomcat/webapps/bidms-backend"
             unpackWARs="true" autoDeploy="true">
         <Valve className="org.apache.catalina.valves.AccessLogValve"
                directory="logs"
                prefix="bidms-backend_access_log" suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+        <Context path="/manager" privileged="true" antiResourceLocking="false"
+                 docBase="manager">
+          <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+                 allow="127\.0\.0\.1|10\.244\.\d+.\d+" />
+        </Context>
       </Host>
     </Engine>
 
@@ -95,12 +135,22 @@
   <Service name="CatalinaBidmsAMQ">
     <Engine name="CatalinaBidmsAMQ"
             defaultHost="localhost-amq">
-      <Host name="localhost-amq" appBase="/usr/local/tomcat/webapps/amq"
+      <Realm className="org.apache.catalina.realm.LockOutRealm">
+        <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+               resourceName="UserDatabase"/>
+      </Realm>
+      <Host name="localhost-amq"
+            appBase="/usr/local/tomcat/webapps/amq"
             unpackWARs="true" autoDeploy="true">
         <Valve className="org.apache.catalina.valves.AccessLogValve"
                directory="logs"
                prefix="amq_access_log" suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+        <Context path="/manager" privileged="true" antiResourceLocking="false"
+                 docBase="manager">
+          <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+                 allow="127\.0\.0\.1|10\.244\.\d+.\d+" />
+        </Context>
       </Host>
     </Engine>
 
