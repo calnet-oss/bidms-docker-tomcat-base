@@ -124,7 +124,7 @@ RUN mkdir -p /usr/local/tomcat/webapps \
        /usr/local/tomcat/webapps/amq/manager \
   && sed -f /tmp/tmp_tomcat/server_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml
 
-RUN echo "JAVA_OPTS=\"\$JAVA_OPTS -Djava.net.preferIPv4Stack=true\"" >> /etc/default/tomcat${TOMCAT_VERSION}
+RUN echo "JAVA_OPTS=\"\$JAVA_OPTS -Djava.net.preferIPv4Stack=true -Dregistry.config.location=/var/lib/tomcat${TOMCAT_VERSION}/registry\"" >> /etc/default/tomcat${TOMCAT_VERSION}
 
 RUN rm -rf /core /tmp/tmp_passwords /tmp/tmp_tomcat
 
