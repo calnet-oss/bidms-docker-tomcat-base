@@ -83,7 +83,7 @@ RUN chmod 600 /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
 # group readable.
 RUN chmod 640 /etc/tomcat${TOMCAT_VERSION}/server.xml
 
-RUN sed -i 's#directory="logs"#directory="${catalina.logdir}/logs"#' /etc/tomcat${TOMCAT_VERSION}/server.xml
+RUN sed -i 's#directory="logs"#directory="${catalina.logdir}"#' /etc/tomcat${TOMCAT_VERSION}/server.xml
 
 # Add the JNDI resource for the BIDMS database connection pool
 RUN sed -f /tmp/tmp_tomcat/globalnaming_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml
@@ -132,8 +132,8 @@ RUN (echo "\nPODNAME=\$(if [ -f /podinfo/name ]; then cat /podinfo/name; fi)" \
   && echo "PODNAME_OPT=\$(if [ ! -z \"$PODNAME\" ]; then echo \"-Dcatalina.podname=\$PODNAME\"; fi)" \
   && echo "JAVA_OPTS=\"\$JAVA_OPTS -Djava.net.preferIPv4Stack=true -Dregistry.config.location=/var/lib/tomcat${TOMCAT_VERSION}/registry \$PODNAME_OPT -Dcatalina.logdir=\$CATALINA_LOGDIR\"") >> /etc/default/tomcat${TOMCAT_VERSION}
 
-RUN sed -i 's#${catalina.base}/logs#${catalina.logdir}/logs#' /etc/tomcat${TOMCAT_VERSION}/logging.properties
-RUN sed -i 's#${catalina.base}${file.separator}logs#${catalina.logdir}${file.separator}logs#' /etc/tomcat${TOMCAT_VERSION}/policy.d/03catalina.policy
+RUN sed -i 's#${catalina.base}/logs#${catalina.logdir}#' /etc/tomcat${TOMCAT_VERSION}/logging.properties
+RUN sed -i 's#${catalina.base}${file.separator}logs#${catalina.logdir}#' /etc/tomcat${TOMCAT_VERSION}/policy.d/03catalina.policy
 
 RUN rm -rf /core /tmp/tmp_passwords /tmp/tmp_tomcat
 
