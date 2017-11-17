@@ -11,7 +11,7 @@
             appBase="/usr/local/tomcat/webapps/bidms-user-frontend"
             unpackWARs="true" autoDeploy="true">
         <Valve className="org.apache.catalina.valves.AccessLogValve"
-               directory="logs"
+               directory="${catalina.logdir}"
                prefix="bidms-user-frontend_access_log" suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
         <Context path="/manager" privileged="true" antiResourceLocking="false"
@@ -44,7 +44,7 @@
             appBase="/usr/local/tomcat/webapps/bidms-admin-frontend"
             unpackWARs="true" autoDeploy="true">
         <Valve className="org.apache.catalina.valves.AccessLogValve"
-               directory="logs"
+               directory="${catalina.logdir}"
                prefix="bidms-admin-frontend_access_log" suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
         <Context path="/manager" privileged="true" antiResourceLocking="false"
@@ -77,7 +77,7 @@
             appBase="/usr/local/tomcat/webapps/bidms-restapi-frontend"
             unpackWARs="true" autoDeploy="true">
         <Valve className="org.apache.catalina.valves.AccessLogValve"
-               directory="logs"
+               directory="${catalina.logdir}"
                prefix="bidms-restapi-frontend_access_log" suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
         <Context path="/manager" privileged="true" antiResourceLocking="false"
@@ -110,7 +110,7 @@
             appBase="/usr/local/tomcat/webapps/bidms-backend"
             unpackWARs="true" autoDeploy="true">
         <Valve className="org.apache.catalina.valves.AccessLogValve"
-               directory="logs"
+               directory="${catalina.logdir}"
                prefix="bidms-backend_access_log" suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
         <Context path="/manager" privileged="true" antiResourceLocking="false"
@@ -143,7 +143,7 @@
             appBase="/usr/local/tomcat/webapps/amq"
             unpackWARs="true" autoDeploy="true">
         <Valve className="org.apache.catalina.valves.AccessLogValve"
-               directory="logs"
+               directory="${catalina.logdir}"
                prefix="amq_access_log" suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
         <Context path="/manager" privileged="true" antiResourceLocking="false"
