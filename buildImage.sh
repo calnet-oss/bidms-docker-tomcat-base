@@ -66,6 +66,10 @@ elif [ -e $HOME/.aptproxy ]; then
   ARGS+="--build-arg APT_PROXY_URL=$apt_proxy_url "
 fi
 
+if [ ! -z "HAZELCAST_KUBERNETES_ENABLE" ]; then
+  ARGS+="--build-arg HAZELCAST_KUBERNETES_ENABLE=$HAZELCAST_KUBERNETES_ENABLE"
+fi
+
 echo "Using ARGS: $ARGS"
 docker build $ARGS -t bidms/tomcat:latest imageFiles || check_exit
 

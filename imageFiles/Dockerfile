@@ -40,7 +40,7 @@ RUN set -x \
   && apt-get dist-upgrade -y \
   && apt-get install -y tomcat${TOMCAT_VERSION} \
        tomcat${TOMCAT_VERSION}-admin \
-       libservlet3.1-java \
+       libservlet3.1-java telnet dnsutils \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/*
 
@@ -158,9 +158,26 @@ RUN /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_group_pw /t
   && chgrp tomcat${TOMCAT_VERSION} /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml \
   && chmod 640 /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml
 
-# replace membership list, if the membership file exists, otherwise leave
-# list at default
-RUN if [ -f /tmp/tmp_tomcat/hazelcast_members.xml ]; then sed -f /tmp/tmp_tomcat/hazelcast_members.sed -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; fi
+# https://github.com/hazelcast/hazelcast-kubernetes
+# Kubernetes discovery is disabled by default.  Change in config.env.
+ARG HAZELCAST_KUBERNETES_ENABLE=
+ARG HAZELCAST_KUBERNETES_VERSION=1.0.0
+ARG DNSJAVA_VERSION=2.1.8
+COPY hazelcast-kubernetes-${HAZELCAST_KUBERNETES_VERSION}.jar.md5 /tmp/
+COPY dnsjava-${DNSJAVA_VERSION}.jar.md5 /tmp/
+RUN if [ ! -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then ( \
+  wget https://github.com/hazelcast/hazelcast-kubernetes/releases/download/v${HAZELCAST_KUBERNETES_VERSION}/hazelcast-kubernetes-${HAZELCAST_KUBERNETES_VERSION}.jar -O /usr/share/tomcat${TOMCAT_VERSION}/lib/hazelcast-kubernetes-${HAZELCAST_KUBERNETES_VERSION}.jar \
+    && test "$(md5sum /usr/share/tomcat${TOMCAT_VERSION}/lib/hazelcast-kubernetes-${HAZELCAST_KUBERNETES_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/hazelcast-kubernetes-${HAZELCAST_KUBERNETES_VERSION}.jar.md5|cut -d' ' -f1)" \
+    && wget https://jcenter.bintray.com/dnsjava/dnsjava/${DNSJAVA_VERSION}/dnsjava-${DNSJAVA_VERSION}.jar -O /usr/share/tomcat${TOMCAT_VERSION}/lib/dnsjava-${DNSJAVA_VERSION}.jar \
+    && test "$(md5sum /usr/share/tomcat${TOMCAT_VERSION}/lib/dnsjava-${DNSJAVA_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/dnsjava-${DNSJAVA_VERSION}.jar.md5|cut -d' ' -f1)"); \
+fi
+
+# Add discovery configuration to hazelcast.xml.
+RUN if [ -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then sed -f /tmp/tmp_tomcat/hazelcast_join_discovery_memberlist.sed -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; else sed -f /tmp/tmp_tomcat/hazelcast_join_discovery_kubernetes.sed -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; fi
+
+# Replace membership list, if the membership file exists, otherwise leave
+# list at default.
+RUN if [ -z "$HAZELCAST_KUBERNETES_ENABLE" -a -f /tmp/tmp_tomcat/hazelcast_members.xml ]; then sed -f /tmp/tmp_tomcat/hazelcast_members.sed -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; fi
 
 RUN rm -rf /core /tmp/*
 

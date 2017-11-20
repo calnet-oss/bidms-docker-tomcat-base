@@ -9,12 +9,7 @@
     <network>
         <join>
             <multicast enabled="false"/>
-            <tcp-ip enabled="true">
-                <interface>127.0.0.1</interface>
-                <member-list>
-                    <member>127.0.0.1</member>
-                </member-list>
-            </tcp-ip>
+            <!-- discovery configuration goes here -->
         </join>
         <symmetric-encryption enabled="true">
             <algorithm>Blowfish</algorithm>
