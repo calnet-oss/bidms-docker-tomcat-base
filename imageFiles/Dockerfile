@@ -147,9 +147,14 @@ COPY hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.j
 RUN wget https://github.com/hazelcast/hazelcast-tomcat-sessionmanager/releases/download/v${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar -O /usr/share/tomcat8/lib/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar \
   && test "$(md5sum /usr/share/tomcat8/lib/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar.md5|cut -d' ' -f1)"
 
-COPY hazelcast.xml /etc/tomcat${TOMCAT_VERSION}/
+COPY hazelcast.xml /tmp
 
-RUN rm -rf /core /tmp/tmp_passwords /tmp/tmp_tomcat
+# replace the password in hazelcast.xml with the one in tmp_passwords/hazelcast_group_pw
+RUN /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_group_pw /tmp/hazelcast.xml GROUP_PASSWORD > /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml \
+  && chgrp tomcat8 /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml \
+  && chmod 640 /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml
+
+RUN rm -rf /core /tmp/*
 
 # webapps-bidms-user-frontend
 EXPOSE 8540
