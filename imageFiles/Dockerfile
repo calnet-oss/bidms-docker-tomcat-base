@@ -138,10 +138,14 @@ RUN sed -i 's#${catalina.base}/logs#${catalina.logdir}#' /etc/tomcat${TOMCAT_VER
 RUN sed -i 's#${catalina.base}${file.separator}logs#${catalina.logdir}#' /etc/tomcat${TOMCAT_VERSION}/policy.d/03catalina.policy
 
 ARG HAZELCAST_VERSION=3.9
-RUN wget https://jcenter.bintray.com/com/hazelcast/hazelcast-all/${HAZELCAST_VERSION}/hazelcast-all-${HAZELCAST_VERSION}.jar -O /usr/share/tomcat8/lib/hazelcast-all-${HAZELCAST_VERSION}.jar
+COPY hazelcast-all-${HAZELCAST_VERSION}.jar.md5 /tmp/
+RUN wget https://jcenter.bintray.com/com/hazelcast/hazelcast-all/${HAZELCAST_VERSION}/hazelcast-all-${HAZELCAST_VERSION}.jar -O /usr/share/tomcat8/lib/hazelcast-all-${HAZELCAST_VERSION}.jar \
+  && test "$(md5sum /usr/share/tomcat8/lib/hazelcast-all-${HAZELCAST_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/hazelcast-all-${HAZELCAST_VERSION}.jar.md5|cut -d' ' -f1)"
 
 ARG HAZELCAST_TOMCAT_SESSION_MGR_VERSION=1.1.2
-RUN wget https://github.com/hazelcast/hazelcast-tomcat-sessionmanager/releases/download/v${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar -O /usr/share/tomcat8/lib/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar
+COPY hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar.md5 /tmp/
+RUN wget https://github.com/hazelcast/hazelcast-tomcat-sessionmanager/releases/download/v${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar -O /usr/share/tomcat8/lib/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar \
+  && test "$(md5sum /usr/share/tomcat8/lib/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar.md5|cut -d' ' -f1)"
 
 COPY hazelcast.xml /etc/tomcat${TOMCAT_VERSION}/
 
