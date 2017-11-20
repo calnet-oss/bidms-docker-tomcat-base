@@ -124,17 +124,26 @@ RUN mkdir -p /usr/local/tomcat/webapps \
        /usr/local/tomcat/webapps/bidms-backend/manager \
   && ln -fs /usr/share/tomcat${TOMCAT_VERSION}-admin/manager \
        /usr/local/tomcat/webapps/amq/manager \
-  && sed -f /tmp/tmp_tomcat/server_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml
+  && sed -f /tmp/tmp_tomcat/server_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml \
+  && sed -f /tmp/tmp_tomcat/context_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/context.xml
 
 RUN (echo "\nGRAILS_ENV=development" \
   && echo "PODNAME=\$(if [ -f /podinfo/name ]; then cat /podinfo/name; fi)" \
   && echo "CATALINA_LOGDIR=\$(if [ -z \"\$PODNAME\" ]; then echo \"logs\"; else echo \"logs/\$PODNAME\"; fi)" \
   && echo "if [ ! -z \"\$PODNAME\" ]; then\n  if [ ! -d \"/var/lib/tomcat${TOMCAT_VERSION}/logs/\${PODNAME}\" ]; then\n    mkdir /var/lib/tomcat${TOMCAT_VERSION}/logs/\${PODNAME}\n    chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} /var/lib/tomcat${TOMCAT_VERSION}/logs/\${PODNAME}\n  fi\n  CATALINA_OUT=\"/var/lib/tomcat${TOMCAT_VERSION}/logs/\${PODNAME}/catalina.out\"\nfi" \
   && echo "PODNAME_OPT=\$(if [ ! -z \"\$PODNAME\" ]; then echo \"-Dcatalina.podname=\$PODNAME\"; fi)" \
-  && echo "JAVA_OPTS=\"\$JAVA_OPTS -Djava.net.preferIPv4Stack=true -Dgrails.env=\$GRAILS_ENV -Dregistry.config.location=/var/lib/tomcat${TOMCAT_VERSION}/registry \$PODNAME_OPT -Dcatalina.logdir=\$CATALINA_LOGDIR\"") >> /etc/default/tomcat${TOMCAT_VERSION}
+  && echo "JAVA_OPTS=\"\$JAVA_OPTS -Djava.net.preferIPv4Stack=true -Dgrails.env=\$GRAILS_ENV -Dregistry.config.location=/var/lib/tomcat${TOMCAT_VERSION}/registry \$PODNAME_OPT -Dcatalina.logdir=\$CATALINA_LOGDIR -Dhazelcast.config=/etc/tomcat${TOMCAT_VERSION}/hazelcast.xml\"") >> /etc/default/tomcat${TOMCAT_VERSION}
 
 RUN sed -i 's#${catalina.base}/logs#${catalina.logdir}#' /etc/tomcat${TOMCAT_VERSION}/logging.properties
 RUN sed -i 's#${catalina.base}${file.separator}logs#${catalina.logdir}#' /etc/tomcat${TOMCAT_VERSION}/policy.d/03catalina.policy
+
+ARG HAZELCAST_VERSION=3.9
+RUN wget https://jcenter.bintray.com/com/hazelcast/hazelcast-all/${HAZELCAST_VERSION}/hazelcast-all-${HAZELCAST_VERSION}.jar -O /usr/share/tomcat8/lib/hazelcast-all-${HAZELCAST_VERSION}.jar
+
+ARG HAZELCAST_TOMCAT_SESSION_MGR_VERSION=1.1.2
+RUN wget https://github.com/hazelcast/hazelcast-tomcat-sessionmanager/releases/download/v${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar -O /usr/share/tomcat8/lib/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar
+
+COPY hazelcast.xml /etc/tomcat${TOMCAT_VERSION}/
 
 RUN rm -rf /core /tmp/tmp_passwords /tmp/tmp_tomcat
 

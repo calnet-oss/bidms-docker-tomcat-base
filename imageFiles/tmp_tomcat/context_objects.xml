@@ -1,0 +1,9 @@
+    <!-- Hazelcast -->
+    <!-- non-stickyness only turned off for testing -->
+    <Manager className="com.hazelcast.session.HazelcastSessionManager"
+             mapName="sessions"
+             sticky="false"
+             processExpiresFrequency="15"
+             deferredWrite="true" />
+
+</Context>

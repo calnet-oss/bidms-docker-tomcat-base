@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hazelcast xsi:schemaLocation="http://www.hazelcast.com/schema/config hazelcast-config-3.9.xsd"
+           xmlns="http://www.hazelcast.com/schema/config"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <group>
+        <name>bidms</name>
+        <password>changeit</password>
+    </group>
+    <network>
+        <join>
+            <multicast enabled="false"/>
+            <tcp-ip enabled="true">
+                <interface>127.0.0.1</interface>
+                <member-list>
+                    <member>127.0.0.1</member>
+                </member-list>
+            </tcp-ip>
+        </join>
+        <ssl enabled="false"/>
+    </network>
+    <map name="sessions">
+        <time-to-live-seconds>0</time-to-live-seconds>
+        <!-- Tomcat's session timeout of 30 minutes. -->
+        <max-idle-seconds>1800</max-idle-seconds>
+        <!-- least recently used -->
+        <eviction-policy>LRU</eviction-policy>
+        <!-- this is on a per-map basis: we're only using one map. -->
+        <max-size policy="USED_HEAP_PERCENTAGE">7</max-size>
+    </map>
+
+</hazelcast>
