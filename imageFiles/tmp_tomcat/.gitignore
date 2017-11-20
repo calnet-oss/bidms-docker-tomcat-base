@@ -1,2 +1,3 @@
 tomcat.jks
 tomcat_pubkey.pem
+hazelcast_members.xml

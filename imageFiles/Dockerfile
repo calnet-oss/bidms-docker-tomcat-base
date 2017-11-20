@@ -158,6 +158,10 @@ RUN /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_group_pw /t
   && chgrp tomcat${TOMCAT_VERSION} /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml \
   && chmod 640 /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml
 
+# replace membership list, if the membership file exists, otherwise leave
+# list at default
+RUN if [ -f /tmp/tmp_tomcat/hazelcast_members.xml ]; then sed -f /tmp/tmp_tomcat/hazelcast_members.sed -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; fi
+
 RUN rm -rf /core /tmp/*
 
 # webapps-bidms-user-frontend
