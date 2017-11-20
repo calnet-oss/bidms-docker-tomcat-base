@@ -11,11 +11,20 @@ if(!$REPLACEWITH_FILE || !$TEMPLATE_FILE || !$REPLACE_STRING) {
   exit 1;
 }
 
-open(my $fh, "<$REPLACEWITH_FILE") || die "Couldn't open $REPLACEWITH_FILE";
-$_=<$fh>;
+my $fh;
+
+if($REPLACEWITH_FILE ne "-") {
+  open($fh, "<$REPLACEWITH_FILE") || die "Couldn't open $REPLACEWITH_FILE";
+}
+else {
+  $fh = \*STDIN;
+}
+$ _ = <$fh>;
 chop;
-my($replaceWithString)=$_;
-close $fh;
+my($replaceWithString) = $_;
+if($REPLACEWITH_FILE ne "-") {
+  close $fh;
+}
 
 open($fh, "<$TEMPLATE_FILE") || die "Couldn't open $TEMPLATE_FILE";
 while(<$fh>) {

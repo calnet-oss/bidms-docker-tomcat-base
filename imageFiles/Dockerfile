@@ -73,8 +73,8 @@ RUN sed -i 's/<\/tomcat-users>/  <role rolename="manager-gui"\/>\n  <role rolena
 RUN mkdir /etc/tomcat${TOMCAT_VERSION}/certs
 COPY tmp_tomcat/tomcat.jks /etc/tomcat${TOMCAT_VERSION}/certs
 COPY tmp_tomcat/tomcat_pubkey.pem /etc/tomcat${TOMCAT_VERSION}/certs
-RUN chmod 600 /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
-  && chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} \
+RUN chmod 640 /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
+  && chgrp tomcat${TOMCAT_VERSION} \
        /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
        /etc/tomcat${TOMCAT_VERSION}/certs/tomcat_pubkey.pem
 
@@ -139,19 +139,23 @@ RUN sed -i 's#${catalina.base}${file.separator}logs#${catalina.logdir}#' /etc/to
 
 ARG HAZELCAST_VERSION=3.9
 COPY hazelcast-all-${HAZELCAST_VERSION}.jar.md5 /tmp/
-RUN wget https://jcenter.bintray.com/com/hazelcast/hazelcast-all/${HAZELCAST_VERSION}/hazelcast-all-${HAZELCAST_VERSION}.jar -O /usr/share/tomcat8/lib/hazelcast-all-${HAZELCAST_VERSION}.jar \
-  && test "$(md5sum /usr/share/tomcat8/lib/hazelcast-all-${HAZELCAST_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/hazelcast-all-${HAZELCAST_VERSION}.jar.md5|cut -d' ' -f1)"
+RUN wget https://jcenter.bintray.com/com/hazelcast/hazelcast-all/${HAZELCAST_VERSION}/hazelcast-all-${HAZELCAST_VERSION}.jar -O /usr/share/tomcat${TOMCAT_VERSION}/lib/hazelcast-all-${HAZELCAST_VERSION}.jar \
+  && test "$(md5sum /usr/share/tomcat${TOMCAT_VERSION}/lib/hazelcast-all-${HAZELCAST_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/hazelcast-all-${HAZELCAST_VERSION}.jar.md5|cut -d' ' -f1)"
 
 ARG HAZELCAST_TOMCAT_SESSION_MGR_VERSION=1.1.2
 COPY hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar.md5 /tmp/
-RUN wget https://github.com/hazelcast/hazelcast-tomcat-sessionmanager/releases/download/v${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar -O /usr/share/tomcat8/lib/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar \
-  && test "$(md5sum /usr/share/tomcat8/lib/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar.md5|cut -d' ' -f1)"
+RUN wget https://github.com/hazelcast/hazelcast-tomcat-sessionmanager/releases/download/v${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar -O /usr/share/tomcat${TOMCAT_VERSION}/lib/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar \
+  && test "$(md5sum /usr/share/tomcat${TOMCAT_VERSION}/lib/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar.md5|cut -d' ' -f1)"
 
 COPY hazelcast.xml /tmp
 
-# replace the password in hazelcast.xml with the one in tmp_passwords/hazelcast_group_pw
-RUN /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_group_pw /tmp/hazelcast.xml GROUP_PASSWORD > /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml \
-  && chgrp tomcat8 /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml \
+# replace the passwords/salts in hazelcast.xml with the ones from files in
+# tmp_passwords
+RUN /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_group_pw /tmp/hazelcast.xml GROUP_PASSWORD | \
+      /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_enc_pw - ENC_PW | \
+      /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_salt_pw - ENC_SALT \
+        > /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml \
+  && chgrp tomcat${TOMCAT_VERSION} /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml \
   && chmod 640 /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml
 
 RUN rm -rf /core /tmp/*

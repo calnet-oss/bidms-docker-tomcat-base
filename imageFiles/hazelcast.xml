@@ -16,7 +16,12 @@
                 </member-list>
             </tcp-ip>
         </join>
-        <ssl enabled="false"/>
+        <symmetric-encryption enabled="true">
+            <algorithm>Blowfish</algorithm>
+            <salt>ENC_SALT</salt>
+            <password>ENC_PW</password>
+            <iteration-count>5</iteration-count>
+        </symmetric-encryption>
     </network>
     <map name="sessions">
         <time-to-live-seconds>0</time-to-live-seconds>

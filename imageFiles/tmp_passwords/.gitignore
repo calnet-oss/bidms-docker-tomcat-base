@@ -1,3 +1,5 @@
 tomcat_manager_pw
 tomcat_manager-script_pw
 hazelcast_group_pw
+hazelcast_enc_pw
+hazelcast_salt_pw
