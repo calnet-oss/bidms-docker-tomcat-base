@@ -6,6 +6,10 @@
         <name>bidms</name>
         <password>GROUP_PASSWORD</password>
     </group>
+    <properties>
+        <!-- enable for kubernetes discovery -->
+        <property name="hazelcast.discovery.enabled">false</property>
+    </properties>
     <network>
         <join>
             <multicast enabled="false"/>

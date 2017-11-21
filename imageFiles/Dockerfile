@@ -173,7 +173,12 @@ RUN if [ ! -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then ( \
 fi
 
 # Add discovery configuration to hazelcast.xml.
-RUN if [ -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then sed -f /tmp/tmp_tomcat/hazelcast_join_discovery_memberlist.sed -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; else sed -f /tmp/tmp_tomcat/hazelcast_join_discovery_kubernetes.sed -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; fi
+RUN if [ -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then \
+  sed -f /tmp/tmp_tomcat/hazelcast_join_discovery_memberlist.sed -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; \
+else \
+  sed -f /tmp/tmp_tomcat/hazelcast_join_discovery_kubernetes.sed -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; \
+  sed 's#<property name="hazelcast.discovery.enabled">false</property>#<property name="hazelcast.discovery.enabled">true</property>#' -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; \
+fi
 
 # Replace membership list, if the membership file exists, otherwise leave
 # list at default.
