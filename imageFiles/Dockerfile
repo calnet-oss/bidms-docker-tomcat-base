@@ -147,7 +147,7 @@ COPY hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.j
 RUN wget https://github.com/hazelcast/hazelcast-tomcat-sessionmanager/releases/download/v${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar -O /usr/share/tomcat${TOMCAT_VERSION}/lib/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar \
   && test "$(md5sum /usr/share/tomcat${TOMCAT_VERSION}/lib/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar.md5|cut -d' ' -f1)"
 
-COPY hazelcast.xml /tmp
+COPY hazelcast.xml hazelcast-client.xml /tmp/
 
 # replace the passwords/salts in hazelcast.xml with the ones from files in
 # tmp_passwords
@@ -157,6 +157,15 @@ RUN /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_group_pw /t
         > /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml \
   && chgrp tomcat${TOMCAT_VERSION} /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml \
   && chmod 640 /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml
+
+# replace the passwords/salts in hazelcast-client.xml with the ones from
+# files in tmp_passwords
+RUN /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_group_pw /tmp/hazelcast-client.xml GROUP_PASSWORD | \
+      /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_enc_pw - ENC_PW | \
+      /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_salt_pw - ENC_SALT \
+        > /etc/tomcat${TOMCAT_VERSION}/hazelcast-client.xml \
+  && chgrp tomcat${TOMCAT_VERSION} /etc/tomcat${TOMCAT_VERSION}/hazelcast-client.xml \
+  && chmod 640 /etc/tomcat${TOMCAT_VERSION}/hazelcast-client.xml
 
 # https://github.com/hazelcast/hazelcast-kubernetes
 # Kubernetes discovery is disabled by default.  Change in config.env.
