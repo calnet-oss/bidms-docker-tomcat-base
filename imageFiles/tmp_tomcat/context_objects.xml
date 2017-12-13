@@ -1,7 +1,8 @@
     <!-- Hazelcast -->
+    <!-- Don't set a mapName: We want Hazelcast to pick mapName based on the
+         contextPath per-application.  -->
     <!-- non-stickyness only turned off for testing -->
     <Manager className="com.hazelcast.session.HazelcastSessionManager"
-             mapName="sessions"
              sticky="false"
              processExpiresFrequency="15"
              deferredWrite="true" />
