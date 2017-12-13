@@ -22,14 +22,19 @@
             <iteration-count>5</iteration-count>
         </symmetric-encryption>
     </network>
-    <map name="sessions">
+    <map name="default">
+        <in-memory-format>BINARY</in-memory-format>
+        <backup-count>1</backup-count>
+        <async-backup-count>0</async-backup-count>
         <time-to-live-seconds>0</time-to-live-seconds>
         <!-- Tomcat's session timeout of 30 minutes. -->
         <max-idle-seconds>1800</max-idle-seconds>
         <!-- least recently used -->
         <eviction-policy>LRU</eviction-policy>
-        <!-- this is on a per-map basis: we're only using one map. -->
-        <max-size policy="USED_HEAP_PERCENTAGE">7</max-size>
+        <!-- this is on a per-map basis: we're using one map per webapp -->
+        <max-size policy="USED_HEAP_PERCENTAGE">3</max-size>
+        <merge-policy>com.hazelcast.map.merge.PutIfAbsentMapMergePolicy</merge-policy>
+        <cache-deserialized-values>INDEX-ONLY</cache-deserialized-values>
     </map>
 
 </hazelcast>
