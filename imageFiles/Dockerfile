@@ -160,9 +160,7 @@ RUN /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_group_pw /t
 
 # replace the passwords/salts in hazelcast-client.xml with the ones from
 # files in tmp_passwords
-RUN /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_group_pw /tmp/hazelcast-client.xml GROUP_PASSWORD | \
-      /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_enc_pw - ENC_PW | \
-      /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_salt_pw - ENC_SALT \
+RUN /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_group_pw /tmp/hazelcast-client.xml GROUP_PASSWORD \
         > /etc/tomcat${TOMCAT_VERSION}/hazelcast-client.xml \
   && chgrp tomcat${TOMCAT_VERSION} /etc/tomcat${TOMCAT_VERSION}/hazelcast-client.xml \
   && chmod 640 /etc/tomcat${TOMCAT_VERSION}/hazelcast-client.xml
@@ -192,6 +190,12 @@ fi
 # Replace membership list, if the membership file exists, otherwise leave
 # list at default.
 RUN if [ -z "$HAZELCAST_KUBERNETES_ENABLE" -a -f /tmp/tmp_tomcat/hazelcast_members.xml ]; then sed -f /tmp/tmp_tomcat/hazelcast_members.sed -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; fi
+
+# Put the PostgreSQL JDBC jar in Tomcat's lib directory
+ARG POSTGRESQL_JDBC_VERSION=42.1.4
+COPY postgresql-${POSTGRESQL_JDBC_VERSION}.jar.md5 /tmp/
+RUN wget https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_JDBC_VERSION}.jar -O /usr/share/tomcat${TOMCAT_VERSION}/lib/postgresql-${POSTGRESQL_JDBC_VERSION}.jar \
+      && test "$(md5sum /usr/share/tomcat${TOMCAT_VERSION}/lib/postgresql-${POSTGRESQL_JDBC_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/postgresql-${POSTGRESQL_JDBC_VERSION}.jar.md5|cut -d' ' -f1)"
 
 RUN rm -rf /core /tmp/*
 
