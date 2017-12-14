@@ -78,15 +78,17 @@ RUN chmod 640 /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
        /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
        /etc/tomcat${TOMCAT_VERSION}/certs/tomcat_pubkey.pem
 
-# Only user and group readable because of the JNDI secrets in server.xml.
-# This fine is installed as root and tomcat is the group, so it has to be
-# group readable.
-RUN chmod 640 /etc/tomcat${TOMCAT_VERSION}/server.xml
-
 RUN sed -i 's#directory="logs"#directory="${catalina.logdir}"#' /etc/tomcat${TOMCAT_VERSION}/server.xml
 
 # Add the JNDI resource for the BIDMS database connection pool
 RUN sed -f /tmp/tmp_tomcat/globalnaming_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml
+
+# Replace the JNDI database password
+RUN /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/bidms_db_registry_pw /etc/tomcat${TOMCAT_VERSION}/server.xml BIDMS_DB_REG_PW \
+        > /tmp/server.xml \
+  && mv /tmp/server.xml /etc/tomcat${TOMCAT_VERSION}/server.xml \
+  && chown root:tomcat${TOMCAT_VERSION} /etc/tomcat${TOMCAT_VERSION}/server.xml \
+  && chmod 640 /etc/tomcat${TOMCAT_VERSION}/server.xml
 
 # Add the different TLS port numbers, each pointing to a different webapps
 # base directory.  This gives more flexibility to protect applications
