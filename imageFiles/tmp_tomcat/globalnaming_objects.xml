@@ -11,7 +11,7 @@
               type="javax.sql.DataSource"
               closeMethod="close"
               driverClassName="org.postgresql.Driver"
-              url="jdbc:postgresql://postgresql-port:5432/registry"
+              url="jdbc:postgresql://bidms-postgresql:5432/registry"
               username="registry" password="BIDMS_DB_REG_PW"
               initialSize="1"
               maxActive="500"
