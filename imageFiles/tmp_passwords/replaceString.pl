@@ -20,7 +20,7 @@ else {
   $fh = \*STDIN;
 }
 $ _ = <$fh>;
-chop;
+s/\n|\r$//g;
 my($replaceWithString) = $_;
 if($REPLACEWITH_FILE ne "-") {
   close $fh;
