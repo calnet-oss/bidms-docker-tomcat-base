@@ -33,6 +33,14 @@ chmod 600 imageFiles/tmp_passwords/tomcat_manager_pw \
   imageFiles/tmp_passwords/tomcat_manager-script_pw
 ```
 
+Copy or the public key for PostgGreSQL to
+`imageFiles/tmp_tomcat/postgres_pubkey.pem`.  Assuming you're using
+[bidms-docker-postgresql](http://github.com/calnet-oss/bidms-docker-postgresql)
+and you have it checked out in a directory above this one:
+```
+(cd imageFiles/tmp_tomcat && cp ../../../bidms-docker-postgresql/imageFiles/tls/pubkey.pem postgres_pubkey.pem)
+```
+
 Generate the key pair that Tomcat will use for TLS:
 ```
 ./generateTLSCert.sh

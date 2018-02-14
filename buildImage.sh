@@ -53,6 +53,10 @@ if [ ! -f imageFiles/tmp_tomcat/tomcat_pubkey.pem ]; then
   echo "imageFiles/tmp_tomcat/tomcat_pubkey.pem is missing.  Run ./generateTLSCert.sh"
   exit 1
 fi
+if [ ! -f imageFiles/tmp_tomcat/postgres_pubkey.pem ]; then
+  echo "imageFiles/tmp_tomcat/postgres_pubkey.pem is missing.  This should be the PostgreSQL public key."
+  exit 1
+fi
 
 if [ ! -z "$NETWORK" ]; then
   echo "NETWORK=$NETWORK"
