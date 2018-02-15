@@ -200,8 +200,8 @@ RUN wget https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_JDBC_VERSI
       && test "$(md5sum /usr/share/tomcat${TOMCAT_VERSION}/lib/postgresql-${POSTGRESQL_JDBC_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/postgresql-${POSTGRESQL_JDBC_VERSION}.jar.md5|cut -d' ' -f1)"
 
 # Add the PostgreSQL public key to the system wide trust store
-RUN cp /tmp/tmp_tomcat/postgres_pubkey.pem /usr/local/share/ca-certificates/bidms-postgresql.crt \
-  && update-ca-certificates
+COPY tmp_tomcat/postgres_pubkey.pem /usr/local/share/ca-certificates/bidms-postgresql.crt
+RUN update-ca-certificates
 
 RUN rm -rf /core /tmp/*
 
