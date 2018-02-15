@@ -4,7 +4,7 @@ if [ -z "$KEYSIZE" ]; then
   KEYSIZE=4096
 fi
 
-if [ !-e imageFiles/tmp_tomcat/tomcat.jks ]; then
+if [ ! -e imageFiles/tmp_tomcat/tomcat.jks ]; then
   echo "Generating key.  This can take a few seconds."
   keytool -genkey -alias tomcat -keyalg RSA -keysize $KEYSIZE \
          -validity 10000 \
