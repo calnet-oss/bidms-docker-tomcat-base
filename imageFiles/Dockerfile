@@ -203,6 +203,11 @@ RUN wget https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_JDBC_VERSI
 COPY tmp_tomcat/postgres_pubkey.pem /usr/local/share/ca-certificates/bidms-postgresql.crt
 RUN update-ca-certificates
 
+# CAS, if later deployed, may want to write its logs at this location
+RUN mkdir -p /var/lib/tomcat${TOMCAT_VERSION}/cas/logs \
+  && chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} /var/lib/tomcat${TOMCAT_VERSION}/cas/logs \
+  && ln -fs /var/lib/tomcat${TOMCAT_VERSION}/cas/logs /var/log/cas
+
 RUN rm -rf /core /tmp/*
 
 # webapps-bidms-user-frontend
