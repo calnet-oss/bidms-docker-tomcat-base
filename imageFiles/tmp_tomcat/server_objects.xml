@@ -27,7 +27,7 @@
 
     <Connector port="8540"
                protocol="org.apache.coyote.http11.Http11NioProtocol"
-               maxThreads="500" SSLEnabled="true">
+               maxThreads="4096" SSLEnabled="true">
       <SSLHostConfig>
         <Certificate certificateKeystoreFile="/etc/tomcat8/certs/tomcat.jks"
                      type="RSA" />
@@ -60,7 +60,7 @@
 
     <Connector port="8541"
                protocol="org.apache.coyote.http11.Http11NioProtocol"
-               maxThreads="500" SSLEnabled="true">
+               maxThreads="4096" SSLEnabled="true">
       <SSLHostConfig>
         <Certificate certificateKeystoreFile="/etc/tomcat8/certs/tomcat.jks"
                      type="RSA" />
@@ -93,7 +93,7 @@
 
     <Connector port="8542"
                protocol="org.apache.coyote.http11.Http11NioProtocol"
-               maxThreads="500" SSLEnabled="true">
+               maxThreads="4096" SSLEnabled="true">
       <SSLHostConfig>
         <Certificate certificateKeystoreFile="/etc/tomcat8/certs/tomcat.jks"
                      type="RSA" />
@@ -126,7 +126,7 @@
 
     <Connector port="8543"
                protocol="org.apache.coyote.http11.Http11NioProtocol"
-               maxThreads="500" SSLEnabled="true">
+               maxThreads="4096" SSLEnabled="true">
       <SSLHostConfig>
         <Certificate certificateKeystoreFile="/etc/tomcat8/certs/tomcat.jks"
                      type="RSA" />
@@ -159,7 +159,7 @@
 
     <Connector port="8544"
                protocol="org.apache.coyote.http11.Http11NioProtocol"
-               maxThreads="500" SSLEnabled="true">
+               maxThreads="4096" SSLEnabled="true">
       <SSLHostConfig>
         <Certificate certificateKeystoreFile="/etc/tomcat8/certs/tomcat.jks"
                      type="RSA" />
