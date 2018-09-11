@@ -11,4 +11,6 @@
     <ResourceLink name="jdbc/bidms" global="jdbc/bidms"
                   type="javax.sql.DataSource" />
 
+    <JarScanner scanClassPath="false" />
+
 </Context>
