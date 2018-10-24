@@ -127,8 +127,7 @@ RUN mkdir -p /usr/local/tomcat/webapps \
   && ln -fs /usr/share/tomcat${TOMCAT_VERSION}-admin/manager \
        /usr/local/tomcat/webapps/amq/manager \
   && sed -f /tmp/tmp_tomcat/server_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml \
-  && sed -f /tmp/tmp_tomcat/context_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/context.xml \
-  && /tmp/tmp_tomcat/patchCatalinaProperties.sh /etc/tomcat${TOMCAT_VERSION}/catalina.properties
+  && sed -f /tmp/tmp_tomcat/context_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/context.xml
 
 RUN (echo "\nGRAILS_ENV=development" \
   && echo "PODNAME=\$(if [ -f /podinfo/name ]; then cat /podinfo/name; fi)" \
