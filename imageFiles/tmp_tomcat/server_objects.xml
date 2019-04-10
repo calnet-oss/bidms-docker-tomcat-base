@@ -1,6 +1,3 @@
-  <!-- Hazelcast -->
-  <Listener className="com.hazelcast.session.P2PLifecycleListener"
-            configLocation="/etc/tomcat8/hazelcast.xml" />
 
   <!-- bidms-user-frontend -->
   <Service name="CatalinaBidmsUserFrontend">

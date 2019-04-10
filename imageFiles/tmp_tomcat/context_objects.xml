@@ -1,13 +1,4 @@
 
-    <!-- Hazelcast -->
-    <!-- Don't set a mapName: We want Hazelcast to pick mapName based on the
-         contextPath per-application.  -->
-    <!-- non-stickyness only turned off for testing -->
-    <Manager className="com.hazelcast.session.HazelcastSessionManager"
-             sticky="false"
-             processExpiresFrequency="15"
-             deferredWrite="true" />
-
     <ResourceLink name="jdbc/bidms" global="jdbc/bidms"
                   type="javax.sql.DataSource" />
 
