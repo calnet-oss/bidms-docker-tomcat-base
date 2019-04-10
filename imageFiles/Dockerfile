@@ -70,13 +70,13 @@ RUN sed -i 's/<\/tomcat-users>/  <role rolename="manager-gui"\/>\n  <role rolena
   && echo '</tomcat-users>' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml
 
 # Copy the keystore for TLS
-RUN mkdir /etc/tomcat${TOMCAT_VERSION}/certs
-COPY tmp_tomcat/tomcat.jks /etc/tomcat${TOMCAT_VERSION}/certs
-COPY tmp_tomcat/tomcat_pubkey.pem /etc/tomcat${TOMCAT_VERSION}/certs
-RUN chmod 640 /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
+RUN mkdir /var/lib/tomcat${TOMCAT_VERSION}/certs
+COPY tmp_tomcat/tomcat.jks /var/lib/tomcat${TOMCAT_VERSION}/certs
+COPY tmp_tomcat/tomcat_pubkey.pem /var/lib/tomcat${TOMCAT_VERSION}/certs
+RUN chmod 640 /var/lib/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
   && chgrp tomcat${TOMCAT_VERSION} \
-       /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
-       /etc/tomcat${TOMCAT_VERSION}/certs/tomcat_pubkey.pem
+       /var/lib/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
+       /var/lib/tomcat${TOMCAT_VERSION}/certs/tomcat_pubkey.pem
 
 RUN sed -i 's#directory="logs"#directory="${catalina.logdir}"#' /etc/tomcat${TOMCAT_VERSION}/server.xml
 

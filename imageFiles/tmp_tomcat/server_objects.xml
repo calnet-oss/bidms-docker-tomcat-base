@@ -29,7 +29,7 @@
                protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="4096" SSLEnabled="true">
       <SSLHostConfig>
-        <Certificate certificateKeystoreFile="/etc/tomcat8/certs/tomcat.jks"
+        <Certificate certificateKeystoreFile="/var/lib/tomcat8/certs/tomcat.jks"
                      type="RSA" />
       </SSLHostConfig>
     </Connector>
@@ -62,7 +62,7 @@
                protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="4096" SSLEnabled="true">
       <SSLHostConfig>
-        <Certificate certificateKeystoreFile="/etc/tomcat8/certs/tomcat.jks"
+        <Certificate certificateKeystoreFile="/var/lib/tomcat8/certs/tomcat.jks"
                      type="RSA" />
       </SSLHostConfig>
     </Connector>
@@ -95,7 +95,7 @@
                protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="4096" SSLEnabled="true">
       <SSLHostConfig>
-        <Certificate certificateKeystoreFile="/etc/tomcat8/certs/tomcat.jks"
+        <Certificate certificateKeystoreFile="/var/lib/tomcat8/certs/tomcat.jks"
                      type="RSA" />
       </SSLHostConfig>
     </Connector>
@@ -128,7 +128,7 @@
                protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="4096" SSLEnabled="true">
       <SSLHostConfig>
-        <Certificate certificateKeystoreFile="/etc/tomcat8/certs/tomcat.jks"
+        <Certificate certificateKeystoreFile="/var/lib/tomcat8/certs/tomcat.jks"
                      type="RSA" />
       </SSLHostConfig>
     </Connector>
@@ -161,7 +161,7 @@
                protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="4096" SSLEnabled="true">
       <SSLHostConfig>
-        <Certificate certificateKeystoreFile="/etc/tomcat8/certs/tomcat.jks"
+        <Certificate certificateKeystoreFile="/var/lib/tomcat8/certs/tomcat.jks"
                      type="RSA" />
       </SSLHostConfig>
     </Connector>
