@@ -70,13 +70,13 @@ RUN sed -i 's/<\/tomcat-users>/  <role rolename="manager-gui"\/>\n  <role rolena
   && echo '</tomcat-users>' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml
 
 # Copy the keystore for TLS
-RUN mkdir /etc/tomcat${TOMCAT_VERSION}/certs
-COPY tmp_tomcat/tomcat.jks /etc/tomcat${TOMCAT_VERSION}/certs
-COPY tmp_tomcat/tomcat_pubkey.pem /etc/tomcat${TOMCAT_VERSION}/certs
-RUN chmod 640 /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
+RUN mkdir /var/lib/tomcat${TOMCAT_VERSION}/certs
+COPY tmp_tomcat/tomcat.jks /var/lib/tomcat${TOMCAT_VERSION}/certs
+COPY tmp_tomcat/tomcat_pubkey.pem /var/lib/tomcat${TOMCAT_VERSION}/certs
+RUN chmod 640 /var/lib/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
   && chgrp tomcat${TOMCAT_VERSION} \
-       /etc/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
-       /etc/tomcat${TOMCAT_VERSION}/certs/tomcat_pubkey.pem
+       /var/lib/tomcat${TOMCAT_VERSION}/certs/tomcat.jks \
+       /var/lib/tomcat${TOMCAT_VERSION}/certs/tomcat_pubkey.pem
 
 RUN sed -i 's#directory="logs"#directory="${catalina.logdir}"#' /etc/tomcat${TOMCAT_VERSION}/server.xml
 
@@ -89,6 +89,10 @@ RUN /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/bidms_db_registry_pw 
   && mv /tmp/server.xml /etc/tomcat${TOMCAT_VERSION}/server.xml \
   && chown root:tomcat${TOMCAT_VERSION} /etc/tomcat${TOMCAT_VERSION}/server.xml \
   && chmod 640 /etc/tomcat${TOMCAT_VERSION}/server.xml
+
+ARG HAZELCAST_ENABLE=
+# Kubernetes discovery is disabled by default.  Change in config.env.
+ARG HAZELCAST_KUBERNETES_ENABLE=
 
 # Add the different TLS port numbers, each pointing to a different webapps
 # base directory.  This gives more flexibility to protect applications
@@ -126,15 +130,18 @@ RUN mkdir -p /usr/local/tomcat/webapps \
        /usr/local/tomcat/webapps/bidms-backend/manager \
   && ln -fs /usr/share/tomcat${TOMCAT_VERSION}-admin/manager \
        /usr/local/tomcat/webapps/amq/manager \
+  && if [ ! -z "$HAZELCAST_ENABLE" -o ! -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then sed -f /tmp/tmp_tomcat/server_hazelcast_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml; else true; fi \
   && sed -f /tmp/tmp_tomcat/server_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml \
+  && if [ ! -z "$HAZELCAST_ENABLE" -o ! -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then sed -f /tmp/tmp_tomcat/context_hazelcast_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/context.xml; else true; fi \
   && sed -f /tmp/tmp_tomcat/context_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/context.xml
 
+ARG JAVA_MEM_OPTS="-Xmx1536m"
 RUN (echo "\nGRAILS_ENV=development" \
   && echo "PODNAME=\$(if [ -f /podinfo/name ]; then cat /podinfo/name; fi)" \
   && echo "CATALINA_LOGDIR=\$(if [ -z \"\$PODNAME\" ]; then echo \"logs\"; else echo \"logs/\$PODNAME\"; fi)" \
   && echo "if [ ! -z \"\$PODNAME\" ]; then\n  if [ ! -d \"/var/lib/tomcat${TOMCAT_VERSION}/logs/\${PODNAME}\" ]; then\n    mkdir /var/lib/tomcat${TOMCAT_VERSION}/logs/\${PODNAME}\n    chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} /var/lib/tomcat${TOMCAT_VERSION}/logs/\${PODNAME}\n  fi\n  CATALINA_OUT=\"/var/lib/tomcat${TOMCAT_VERSION}/logs/\${PODNAME}/catalina.out\"\nfi" \
   && echo "PODNAME_OPT=\$(if [ ! -z \"\$PODNAME\" ]; then echo \"-Dcatalina.podname=\$PODNAME\"; fi)" \
-  && echo "JAVA_OPTS=\"\$JAVA_OPTS -Djava.security.egd=file:/dev/urandom -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/log/tomcat${TOMCAT_VERSION} -Dgroovy.use.classvalue=true -Dgrails.env=\$GRAILS_ENV \$PODNAME_OPT -Dcatalina.logdir=\$CATALINA_LOGDIR -Dhazelcast.config=/etc/tomcat${TOMCAT_VERSION}/hazelcast.xml -Dspring.cloud.config.enabled=false -Dcas.standalone.configurationDirectory=/var/lib/tomcat${TOMCAT_VERSION}/cas -Dcas.standalone.configurationFile=/var/lib/tomcat${TOMCAT_VERSION}/cas/cas_config.yml -Dactivemq.conf=/var/lib/tomcat${TOMCAT_VERSION}/amq/conf -Dderby.system.home=/var/lib/tomcat${TOMCAT_VERSION}/amq/data/derby -Dorg.apache.activemq.audit=true -Dcom.sun.management.jmxremote.port=11099 -Dcom.sun.management.jmxremote.password.file=/var/lib/tomcat${TOMCAT_VERSION}/tomcat-conf/jmx.password -Dcom.sun.management.jmxremote.access.file=/var/lib/tomcat${TOMCAT_VERSION}/tomcat-conf/jmx.access -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote\"") >> /etc/default/tomcat${TOMCAT_VERSION}
+  && echo "JAVA_OPTS=\"\$JAVA_OPTS $JAVA_MEM_OPTS -Djava.security.egd=file:/dev/urandom -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/log/tomcat${TOMCAT_VERSION} -Dgroovy.use.classvalue=true -Dgrails.env=\$GRAILS_ENV \$PODNAME_OPT -Dcatalina.logdir=\$CATALINA_LOGDIR -Dhazelcast.config=/etc/tomcat${TOMCAT_VERSION}/hazelcast.xml -Dspring.cloud.config.enabled=false -Dcas.standalone.configurationDirectory=/usr/local/etc/idc/registry/cas -Dcas.standalone.configurationFile=/usr/local/etc/idc/registry/cas/cas_config.yml\"") >> /etc/default/tomcat${TOMCAT_VERSION}
 
 RUN sed -i 's#${catalina.base}/logs#${catalina.logdir}#' /etc/tomcat${TOMCAT_VERSION}/logging.properties
 RUN sed -i 's#${catalina.base}${file.separator}logs#${catalina.logdir}#' /etc/tomcat${TOMCAT_VERSION}/policy.d/03catalina.policy
@@ -168,8 +175,6 @@ RUN /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_group_pw /t
   && chmod 640 /etc/tomcat${TOMCAT_VERSION}/hazelcast-client.xml
 
 # https://github.com/hazelcast/hazelcast-kubernetes
-# Kubernetes discovery is disabled by default.  Change in config.env.
-ARG HAZELCAST_KUBERNETES_ENABLE=
 ARG HAZELCAST_KUBERNETES_VERSION=1.0.0
 ARG DNSJAVA_VERSION=2.1.8
 COPY hazelcast-kubernetes-${HAZELCAST_KUBERNETES_VERSION}.jar.md5 /tmp/
@@ -207,6 +212,16 @@ RUN update-ca-certificates
 RUN mkdir -p /var/lib/tomcat${TOMCAT_VERSION}/cas/logs \
   && chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} /var/lib/tomcat${TOMCAT_VERSION}/cas/logs \
   && ln -fs /var/lib/tomcat${TOMCAT_VERSION}/cas/logs /var/log/cas
+
+# A ~/.grails/registry-pre.groovy file is necessary to establish a
+# configuration directory for BIDMS applications that are later deployed.
+# The tomcat user's home directory is /var/lib/tomcat${TOMCAT_VERSION}.
+RUN mkdir -p /var/lib/tomcat${TOMCAT_VERSION}/.grails \
+  && chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} /var/lib/tomcat${TOMCAT_VERSION}/.grails \
+  && chmod 700 /var/lib/tomcat${TOMCAT_VERSION}/.grails
+
+COPY registry-pre.groovy  /var/lib/tomcat${TOMCAT_VERSION}/.grails
+RUN chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} /var/lib/tomcat${TOMCAT_VERSION}/.grails/registry-pre.groovy
 
 RUN rm -rf /core /tmp/*
 
