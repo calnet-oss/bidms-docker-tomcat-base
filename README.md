@@ -145,7 +145,12 @@ other than BIDMS software.
       access to just about everything except maybe other backend BIDMS
       servers operating within a BIDMS backend cluster.
   * LOCAL_AMQ_TOMCAT_PORT (default: 8344)
-    * ActiveMQ
+    * ActiveMQ web console
+    * Should be tightly protected by at least one firewall that denies
+      access to just about everything except maybe other backend BIDMS
+      servers operating within a BIDMS backend cluster.
+  * LOCAL_AMQ_OPENWIRE_SSL_PORT (default: 61617)
+    * ActiveMQ Openwire SSL (the JMS messaging port)
     * Should be tightly protected by at least one firewall that denies
       access to just about everything except maybe other backend BIDMS
       servers operating within a BIDMS backend cluster.

@@ -95,6 +95,12 @@ else
   echo "ERROR: Required LOCAL_AMQ_TOMCAT_PORT value missing from $CONFIG_FILE"
   exit 1
 fi
+if [ ! -z "$LOCAL_AMQ_OPENWIRE_SSL_PORT" ]; then
+  echo "LOCAL_AMQ_OPENWIRE_SSL_PORT=$LOCAL_AMQ_OPENWIRE_SSL_PORT"
+else
+  echo "ERROR: Required LOCAL_AMQ_OPENWIRE_SSL_PORT value missing from $CONFIG_FILE"
+  exit 1
+fi
 
 if [[ -z "$NO_HOST_TOMCAT_DIRECTORY" && ! -z "$HOST_TOMCAT_DIRECTORY" ]]; then
   echo "HOST_TOMCAT_DIRECTORY=$HOST_TOMCAT_DIRECTORY"
@@ -123,6 +129,7 @@ docker run $INTERACTIVE_PARAMS --rm --name "bidms-tomcat" \
   -p $LOCAL_BIDMS_RESTAPI_FRONTEND_TOMCAT_PORT:8542 \
   -p $LOCAL_BIDMS_BACKEND_TOMCAT_PORT:8543 \
   -p $LOCAL_AMQ_TOMCAT_PORT:8544 \
+  -p $LOCAL_AMQ_OPENWIRE_SSL_PORT:61617 \
   --cap-add=SYS_PTRACE \
   $* \
   bidms/tomcat:latest \

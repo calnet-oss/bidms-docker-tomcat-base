@@ -235,6 +235,8 @@ EXPOSE 8542
 EXPOSE 8543
 # webapps-amq
 EXPOSE 8544
+# ActiveMQ Openwire SSL (the JMS messaging port)
+EXPOSE 61617
 
 COPY etc/container/ /etc/container/
 ENTRYPOINT ["/etc/container/tomcat-entrypoint.sh", "interactive"]
