@@ -40,7 +40,7 @@ RUN set -x \
   && apt-get dist-upgrade -y \
   && apt-get install -y tomcat${TOMCAT_VERSION} \
        tomcat${TOMCAT_VERSION}-admin \
-       libservlet3.1-java telnet dnsutils \
+       libservlet3.1-java telnet dnsutils git \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/*
 
