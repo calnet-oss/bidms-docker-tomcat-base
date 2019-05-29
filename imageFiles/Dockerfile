@@ -97,39 +97,39 @@ ARG HAZELCAST_KUBERNETES_ENABLE=
 # Add the different TLS port numbers, each pointing to a different webapps
 # base directory.  This gives more flexibility to protect applications
 # running on different ports differently, such as with a firewall.
-RUN mkdir -p /usr/local/tomcat/webapps \
+RUN mkdir -p /var/lib/tomcat${TOMCAT_VERSION}/local-webapps \
   && mkdir \
-       /usr/local/tomcat/webapps/bidms-user-frontend \
+       /var/lib/tomcat${TOMCAT_VERSION}/local-webapps/bidms-user-frontend \
        /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsUserFrontend \
-       /usr/local/tomcat/webapps/bidms-admin-frontend \
+       /var/lib/tomcat${TOMCAT_VERSION}/local-webapps/bidms-admin-frontend \
        /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsAdminFrontend \
-       /usr/local/tomcat/webapps/bidms-restapi-frontend \
+       /var/lib/tomcat${TOMCAT_VERSION}/local-webapps/bidms-restapi-frontend \
        /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsRestapiFrontend \
-       /usr/local/tomcat/webapps/bidms-backend \
+       /var/lib/tomcat${TOMCAT_VERSION}/local-webapps/bidms-backend \
        /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsBackend \
-       /usr/local/tomcat/webapps/amq \
+       /var/lib/tomcat${TOMCAT_VERSION}/local-webapps/amq \
        /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsAMQ \
   && chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} \
-       /usr/local/tomcat/webapps/bidms-user-frontend \
+       /var/lib/tomcat${TOMCAT_VERSION}/local-webapps/bidms-user-frontend \
        /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsUserFrontend \
-       /usr/local/tomcat/webapps/bidms-admin-frontend \
+       /var/lib/tomcat${TOMCAT_VERSION}/local-webapps/bidms-admin-frontend \
        /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsAdminFrontend \
-       /usr/local/tomcat/webapps/bidms-restapi-frontend \
+       /var/lib/tomcat${TOMCAT_VERSION}/local-webapps/bidms-restapi-frontend \
        /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsRestapiFrontend \
-       /usr/local/tomcat/webapps/bidms-backend \
+       /var/lib/tomcat${TOMCAT_VERSION}/local-webapps/bidms-backend \
        /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsBackend \
-       /usr/local/tomcat/webapps/amq \
+       /var/lib/tomcat${TOMCAT_VERSION}/local-webapps/amq \
        /etc/tomcat${TOMCAT_VERSION}/CatalinaBidmsAMQ \
   && ln -fs /usr/share/tomcat${TOMCAT_VERSION}-admin/manager \
-       /usr/local/tomcat/webapps/bidms-user-frontend/manager \
+       /var/lib/tomcat${TOMCAT_VERSION}/local-webapps/bidms-user-frontend/manager \
   && ln -fs /usr/share/tomcat${TOMCAT_VERSION}-admin/manager \
-       /usr/local/tomcat/webapps/bidms-admin-frontend/manager \
+       /var/lib/tomcat${TOMCAT_VERSION}/local-webapps/bidms-admin-frontend/manager \
   && ln -fs /usr/share/tomcat${TOMCAT_VERSION}-admin/manager \
-       /usr/local/tomcat/webapps/bidms-restapi-frontend/manager \
+       /var/lib/tomcat${TOMCAT_VERSION}/local-webapps/bidms-restapi-frontend/manager \
   && ln -fs /usr/share/tomcat${TOMCAT_VERSION}-admin/manager \
-       /usr/local/tomcat/webapps/bidms-backend/manager \
+       /var/lib/tomcat${TOMCAT_VERSION}/local-webapps/bidms-backend/manager \
   && ln -fs /usr/share/tomcat${TOMCAT_VERSION}-admin/manager \
-       /usr/local/tomcat/webapps/amq/manager \
+       /var/lib/tomcat${TOMCAT_VERSION}/local-webapps/amq/manager \
   && if [ ! -z "$HAZELCAST_ENABLE" -o ! -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then sed -f /tmp/tmp_tomcat/server_hazelcast_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml; else true; fi \
   && sed -f /tmp/tmp_tomcat/server_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/server.xml \
   && if [ ! -z "$HAZELCAST_ENABLE" -o ! -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then sed -f /tmp/tmp_tomcat/context_hazelcast_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/context.xml; else true; fi \
