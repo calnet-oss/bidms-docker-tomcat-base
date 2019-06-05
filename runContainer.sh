@@ -101,6 +101,10 @@ else
   echo "ERROR: Required LOCAL_AMQ_OPENWIRE_SSL_PORT value missing from $CONFIG_FILE"
   exit 1
 fi
+# Optional
+if [ ! -z "$LOCAL_JVM_DEBUG_PORT" ]; then
+  echo "LOCAL_JVM_DEBUG_PORT=$LOCAL_JVM_DEBUG_PORT"
+fi
 
 if [[ -z "$NO_HOST_TOMCAT_DIRECTORY" && ! -z "$HOST_TOMCAT_DIRECTORY" ]]; then
   echo "HOST_TOMCAT_DIRECTORY=$HOST_TOMCAT_DIRECTORY"
@@ -118,6 +122,11 @@ elif [ ! -z "$NO_INTERACTIVE" ]; then
   ENTRYPOINT_ARGS="detached"
 fi
 
+OPTIONAL_PORT_OPTS=""
+if [ ! -z "$LOCAL_JVM_DEBUG_PORT" ]; then
+  OPTIONAL_PORT_OPTS+="-p $LOCAL_JVM_DEBUG_PORT:4782"
+fi
+
 # SYS_PTRACE capability necessary for /etc/init.d/tomcat script, which uses
 # start-stop-daemon, which needs /proc/<pid>/exe to match a PID with --exec,
 # and SYS_PTRACE needed for /proc/<pid>/exe.
@@ -130,6 +139,7 @@ docker run $INTERACTIVE_PARAMS --rm --name "bidms-tomcat" \
   -p $LOCAL_BIDMS_BACKEND_TOMCAT_PORT:8543 \
   -p $LOCAL_AMQ_TOMCAT_PORT:8544 \
   -p $LOCAL_AMQ_OPENWIRE_SSL_PORT:61617 \
+  $OPTIONAL_PORT_OPTS \
   --cap-add=SYS_PTRACE \
   $* \
   bidms/tomcat:latest \

@@ -154,6 +154,9 @@ other than BIDMS software.
     * Should be tightly protected by at least one firewall that denies
       access to just about everything except maybe other backend BIDMS
       servers operating within a BIDMS backend cluster.
+  * LOCAL_JVM_DEBUG_PORT (optional, default: 4782)
+    * Port for JVM debugger.
+    * Should be tightly protected by a firewall.
 
 There are opportunities to split this further if you need further
 flexibility with setting even finer-grained firewall rules for the various
@@ -163,7 +166,7 @@ web application.
 Although there shouldn't be a reason, if you wish to connect to the Tomcat
 manager web UI application, visit
 ```
-https://localhost:PORT/manager/html/)[https://localhost:8040/manager/html/
+https://localhost:PORT/manager/html/
 ```
 Replace PORT with the port number.  There is a manager app running on each
 port.

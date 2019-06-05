@@ -71,7 +71,15 @@ elif [ -e $HOME/.aptproxy ]; then
 fi
 
 if [ ! -z "HAZELCAST_KUBERNETES_ENABLE" ]; then
-  ARGS+="--build-arg HAZELCAST_KUBERNETES_ENABLE=$HAZELCAST_KUBERNETES_ENABLE"
+  ARGS+="--build-arg HAZELCAST_KUBERNETES_ENABLE=$HAZELCAST_KUBERNETES_ENABLE "
+fi
+
+if [ ! -z "JAVA_MEM_OPTS" ]; then
+  ARGS+="--build-arg JAVA_MEM_OPTS=$JAVA_MEM_OPTS "
+fi
+
+if [ ! -z "JAVA_DEBUG_OPTS" ]; then
+  ARGS+="--build-arg JAVA_DEBUG_OPTS=$JAVA_DEBUG_OPTS "
 fi
 
 echo "Using ARGS: $ARGS"
