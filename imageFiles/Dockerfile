@@ -135,7 +135,11 @@ RUN mkdir -p /var/lib/tomcat${TOMCAT_VERSION}/local-webapps \
   && if [ ! -z "$HAZELCAST_ENABLE" -o ! -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then sed -f /tmp/tmp_tomcat/context_hazelcast_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/context.xml; else true; fi \
   && sed -f /tmp/tmp_tomcat/context_objects.sed -i /etc/tomcat${TOMCAT_VERSION}/context.xml
 
-ARG JAVA_MEM_OPTS="-Xmx1536m"
+# It's possible to override JAVA_MEM_OPTS and JAVA_DEBUG_OPTS at container
+# runtime, as well as adding to JAVA_OPTS, by placing these environment
+# variables in the
+# /var/lib/tomcat${TOMCAT_VERSION}/catalina.env file.
+ARG JAVA_MEM_OPTS="-Xmx2048m"
 # Example JAVA_DEBUG_OPTS="-agentlib:jdwp=transport=dt_socket,address=4782,server=y,suspend=n"
 ARG JAVA_DEBUG_OPTS=""
 RUN (echo "\nGRAILS_ENV=development" \
@@ -143,7 +147,10 @@ RUN (echo "\nGRAILS_ENV=development" \
   && echo "CATALINA_LOGDIR=\$(if [ -z \"\$PODNAME\" ]; then echo \"logs\"; else echo \"logs/\$PODNAME\"; fi)" \
   && echo "if [ ! -z \"\$PODNAME\" ]; then\n  if [ ! -d \"/var/lib/tomcat${TOMCAT_VERSION}/logs/\${PODNAME}\" ]; then\n    mkdir /var/lib/tomcat${TOMCAT_VERSION}/logs/\${PODNAME}\n    chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} /var/lib/tomcat${TOMCAT_VERSION}/logs/\${PODNAME}\n  fi\n  CATALINA_OUT=\"/var/lib/tomcat${TOMCAT_VERSION}/logs/\${PODNAME}/catalina.out\"\nfi" \
   && echo "PODNAME_OPT=\$(if [ ! -z \"\$PODNAME\" ]; then echo \"-Dcatalina.podname=\$PODNAME\"; fi)" \
-  && echo "JAVA_OPTS=\"\$JAVA_OPTS $JAVA_MEM_OPTS $JAVA_DEBUG_OPTS -Djava.security.egd=file:/dev/urandom -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/log/tomcat${TOMCAT_VERSION} -Dgroovy.use.classvalue=true -Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true -Dgrails.env=\$GRAILS_ENV \$PODNAME_OPT -Dcatalina.logdir=\$CATALINA_LOGDIR -Dhazelcast.config=/etc/tomcat${TOMCAT_VERSION}/hazelcast.xml -Dspring.cloud.config.enabled=false -Dcas.standalone.configurationDirectory=/var/lib/tomcat${TOMCAT_VERSION}/cas -Dcas.standalone.configurationFile=/var/lib/tomcat${TOMCAT_VERSION}/cas/cas_config.yml -Dactivemq.conf=/var/lib/tomcat${TOMCAT_VERSION}/amq/conf -Dderby.system.home=/var/lib/tomcat${TOMCAT_VERSION}/amq/data/derby -Dorg.apache.activemq.audit=true -Dcom.sun.management.jmxremote.port=11099 -Dcom.sun.management.jmxremote.password.file=/var/lib/tomcat${TOMCAT_VERSION}/tomcat-conf/jmx.password -Dcom.sun.management.jmxremote.access.file=/var/lib/tomcat${TOMCAT_VERSION}/tomcat-conf/jmx.access -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote\"") >> /etc/default/tomcat${TOMCAT_VERSION}
+  && echo "JAVA_MEM_OPTS=\"$JAVA_MEM_OPTS\"" \
+  && echo "JAVA_DEBUG_OPTS=\"$JAVA_DEBUG_OPTS\"" \
+  && echo "if [ -f /var/lib/tomcat${TOMCAT_VERSION}/catalina.env ]; then . /var/lib/tomcat${TOMCAT_VERSION}/catalina.env; fi" \
+  && echo "JAVA_OPTS=\"\$JAVA_OPTS \$JAVA_MEM_OPTS \$JAVA_DEBUG_OPTS -Djava.security.egd=file:/dev/urandom -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/log/tomcat${TOMCAT_VERSION} -Dgroovy.use.classvalue=true -Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true -Dgrails.env=\$GRAILS_ENV \$PODNAME_OPT -Dcatalina.logdir=\$CATALINA_LOGDIR -Dhazelcast.config=/etc/tomcat${TOMCAT_VERSION}/hazelcast.xml -Dspring.cloud.config.enabled=false -Dcas.standalone.configurationDirectory=/var/lib/tomcat${TOMCAT_VERSION}/cas -Dcas.standalone.configurationFile=/var/lib/tomcat${TOMCAT_VERSION}/cas/cas_config.yml -Dactivemq.conf=/var/lib/tomcat${TOMCAT_VERSION}/amq/conf -Dderby.system.home=/var/lib/tomcat${TOMCAT_VERSION}/amq/data/derby -Dorg.apache.activemq.audit=true -Dcom.sun.management.jmxremote.port=11099 -Dcom.sun.management.jmxremote.password.file=/var/lib/tomcat${TOMCAT_VERSION}/tomcat-conf/jmx.password -Dcom.sun.management.jmxremote.access.file=/var/lib/tomcat${TOMCAT_VERSION}/tomcat-conf/jmx.access -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote\"") >> /etc/default/tomcat${TOMCAT_VERSION}
 
 RUN sed -i 's#${catalina.base}/logs#${catalina.logdir}#' /etc/tomcat${TOMCAT_VERSION}/logging.properties
 RUN sed -i 's#${catalina.base}${file.separator}logs#${catalina.logdir}#' /etc/tomcat${TOMCAT_VERSION}/policy.d/03catalina.policy
