@@ -1,3 +1,5 @@
 tomcat.jks
 tomcat_pubkey.pem
 hazelcast_members.xml
+ad_pubkey.pem
+bidms_ca_pubkey.pem

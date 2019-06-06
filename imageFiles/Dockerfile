@@ -213,8 +213,12 @@ COPY postgresql-${POSTGRESQL_JDBC_VERSION}.jar.md5 /tmp/
 RUN wget https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_JDBC_VERSION}.jar -O /usr/share/tomcat${TOMCAT_VERSION}/lib/postgresql-${POSTGRESQL_JDBC_VERSION}.jar \
       && test "$(md5sum /usr/share/tomcat${TOMCAT_VERSION}/lib/postgresql-${POSTGRESQL_JDBC_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/postgresql-${POSTGRESQL_JDBC_VERSION}.jar.md5|cut -d' ' -f1)"
 
+# Add the CA public key used to issue certs.
+COPY tmp_tomcat/bidms_ca_pubkey.pem /usr/local/share/ca-certificates/bidms-ca.crt
 # Add the PostgreSQL public key to the system wide trust store
 COPY tmp_tomcat/postgres_pubkey.pem /usr/local/share/ca-certificates/bidms-postgresql.crt
+# Add the Active Directory CA public key (or, the AD public key)
+COPY tmp_tomcat/ad_pubkey.pem /usr/local/share/ca-certificates/bidms-ad.crt
 RUN update-ca-certificates
 
 # CAS, if later deployed, may want to write its logs at this location
