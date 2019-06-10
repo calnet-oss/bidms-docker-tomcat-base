@@ -147,41 +147,46 @@ RUN (echo "\nGRAILS_ENV=development" \
   && echo "CATALINA_LOGDIR=\$(if [ -z \"\$PODNAME\" ]; then echo \"logs\"; else echo \"logs/\$PODNAME\"; fi)" \
   && echo "if [ ! -z \"\$PODNAME\" ]; then\n  if [ ! -d \"/var/lib/tomcat${TOMCAT_VERSION}/logs/\${PODNAME}\" ]; then\n    mkdir /var/lib/tomcat${TOMCAT_VERSION}/logs/\${PODNAME}\n    chown tomcat${TOMCAT_VERSION}:tomcat${TOMCAT_VERSION} /var/lib/tomcat${TOMCAT_VERSION}/logs/\${PODNAME}\n  fi\n  CATALINA_OUT=\"/var/lib/tomcat${TOMCAT_VERSION}/logs/\${PODNAME}/catalina.out\"\nfi" \
   && echo "PODNAME_OPT=\$(if [ ! -z \"\$PODNAME\" ]; then echo \"-Dcatalina.podname=\$PODNAME\"; fi)" \
+  && if [ ! -z "$HAZELCAST_ENABLE" -o ! -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then echo "HAZELCAST_OPTIONS=\"-Dhazelcast.config=/etc/tomcat${TOMCAT_VERSION}/hazelcast.xml\""; else echo "HAZELCAST_OPTIONS=\"\""; fi \
   && echo "JAVA_MEM_OPTS=\"$JAVA_MEM_OPTS\"" \
   && echo "JAVA_DEBUG_OPTS=\"$JAVA_DEBUG_OPTS\"" \
   && echo "if [ -f /var/lib/tomcat${TOMCAT_VERSION}/catalina.env ]; then . /var/lib/tomcat${TOMCAT_VERSION}/catalina.env; fi" \
-  && echo "JAVA_OPTS=\"\$JAVA_OPTS \$JAVA_MEM_OPTS \$JAVA_DEBUG_OPTS -Djava.security.egd=file:/dev/urandom -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/log/tomcat${TOMCAT_VERSION} -Dgroovy.use.classvalue=true -Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true -Dgrails.env=\$GRAILS_ENV \$PODNAME_OPT -Dcatalina.logdir=\$CATALINA_LOGDIR -Dhazelcast.config=/etc/tomcat${TOMCAT_VERSION}/hazelcast.xml -Dspring.cloud.config.enabled=false -Dcas.standalone.configurationDirectory=/var/lib/tomcat${TOMCAT_VERSION}/cas -Dcas.standalone.configurationFile=/var/lib/tomcat${TOMCAT_VERSION}/cas/cas_config.yml -Dactivemq.conf=/var/lib/tomcat${TOMCAT_VERSION}/amq/conf -Dderby.system.home=/var/lib/tomcat${TOMCAT_VERSION}/amq/data/derby -Dorg.apache.activemq.audit=true -Dcom.sun.management.jmxremote.port=11099 -Dcom.sun.management.jmxremote.password.file=/var/lib/tomcat${TOMCAT_VERSION}/tomcat-conf/jmx.password -Dcom.sun.management.jmxremote.access.file=/var/lib/tomcat${TOMCAT_VERSION}/tomcat-conf/jmx.access -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote\"") >> /etc/default/tomcat${TOMCAT_VERSION}
+  && echo "JAVA_OPTS=\"\$JAVA_OPTS \$JAVA_MEM_OPTS \$JAVA_DEBUG_OPTS -Djava.security.egd=file:/dev/urandom -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/log/tomcat${TOMCAT_VERSION} -Dgroovy.use.classvalue=true -Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true -Dgrails.env=\$GRAILS_ENV \$PODNAME_OPT -Dcatalina.logdir=\$CATALINA_LOGDIR \$HAZELCAST_OPTIONS -Dspring.cloud.config.enabled=false -Dcas.standalone.configurationDirectory=/var/lib/tomcat${TOMCAT_VERSION}/cas -Dcas.standalone.configurationFile=/var/lib/tomcat${TOMCAT_VERSION}/cas/cas_config.yml -Dactivemq.conf=/var/lib/tomcat${TOMCAT_VERSION}/amq/conf -Dderby.system.home=/var/lib/tomcat${TOMCAT_VERSION}/amq/data/derby -Dorg.apache.activemq.audit=true -Dcom.sun.management.jmxremote.port=11099 -Dcom.sun.management.jmxremote.password.file=/var/lib/tomcat${TOMCAT_VERSION}/tomcat-conf/jmx.password -Dcom.sun.management.jmxremote.access.file=/var/lib/tomcat${TOMCAT_VERSION}/tomcat-conf/jmx.access -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote\"") >> /etc/default/tomcat${TOMCAT_VERSION}
 
 RUN sed -i 's#${catalina.base}/logs#${catalina.logdir}#' /etc/tomcat${TOMCAT_VERSION}/logging.properties
 RUN sed -i 's#${catalina.base}${file.separator}logs#${catalina.logdir}#' /etc/tomcat${TOMCAT_VERSION}/policy.d/03catalina.policy
 
 ARG HAZELCAST_VERSION=3.9
 COPY hazelcast-all-${HAZELCAST_VERSION}.jar.md5 /tmp/
-RUN wget https://jcenter.bintray.com/com/hazelcast/hazelcast-all/${HAZELCAST_VERSION}/hazelcast-all-${HAZELCAST_VERSION}.jar -O /usr/share/tomcat${TOMCAT_VERSION}/lib/hazelcast-all-${HAZELCAST_VERSION}.jar \
-  && test "$(md5sum /usr/share/tomcat${TOMCAT_VERSION}/lib/hazelcast-all-${HAZELCAST_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/hazelcast-all-${HAZELCAST_VERSION}.jar.md5|cut -d' ' -f1)"
+RUN if [ ! -z "$HAZELCAST_ENABLE" -o ! -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then \
+  wget https://jcenter.bintray.com/com/hazelcast/hazelcast-all/${HAZELCAST_VERSION}/hazelcast-all-${HAZELCAST_VERSION}.jar -O /usr/share/tomcat${TOMCAT_VERSION}/lib/hazelcast-all-${HAZELCAST_VERSION}.jar \
+  && test "$(md5sum /usr/share/tomcat${TOMCAT_VERSION}/lib/hazelcast-all-${HAZELCAST_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/hazelcast-all-${HAZELCAST_VERSION}.jar.md5|cut -d' ' -f1)"; fi
 
 ARG HAZELCAST_TOMCAT_SESSION_MGR_VERSION=1.1.2
 COPY hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar.md5 /tmp/
-RUN wget https://github.com/hazelcast/hazelcast-tomcat-sessionmanager/releases/download/v${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar -O /usr/share/tomcat${TOMCAT_VERSION}/lib/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar \
-  && test "$(md5sum /usr/share/tomcat${TOMCAT_VERSION}/lib/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar.md5|cut -d' ' -f1)"
+RUN if [ ! -z "$HAZELCAST_ENABLE" -o ! -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then \
+  wget https://github.com/hazelcast/hazelcast-tomcat-sessionmanager/releases/download/v${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar -O /usr/share/tomcat${TOMCAT_VERSION}/lib/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar \
+  && test "$(md5sum /usr/share/tomcat${TOMCAT_VERSION}/lib/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/hazelcast-tomcat85-sessionmanager-${HAZELCAST_TOMCAT_SESSION_MGR_VERSION}.jar.md5|cut -d' ' -f1)"; fi
 
 COPY hazelcast.xml hazelcast-client.xml /tmp/
 
 # replace the passwords/salts in hazelcast.xml with the ones from files in
 # tmp_passwords
-RUN /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_group_pw /tmp/hazelcast.xml GROUP_PASSWORD | \
+RUN if [ ! -z "$HAZELCAST_ENABLE" -o ! -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then \
+  /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_group_pw /tmp/hazelcast.xml GROUP_PASSWORD | \
       /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_enc_pw - ENC_PW | \
       /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_salt_pw - ENC_SALT \
         > /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml \
   && chgrp tomcat${TOMCAT_VERSION} /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml \
-  && chmod 640 /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml
+  && chmod 640 /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; fi
 
 # replace the passwords/salts in hazelcast-client.xml with the ones from
 # files in tmp_passwords
-RUN /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_group_pw /tmp/hazelcast-client.xml GROUP_PASSWORD \
+RUN if [ ! -z "$HAZELCAST_ENABLE" -o ! -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then \
+  /tmp/tmp_passwords/replaceString.pl /tmp/tmp_passwords/hazelcast_group_pw /tmp/hazelcast-client.xml GROUP_PASSWORD \
         > /etc/tomcat${TOMCAT_VERSION}/hazelcast-client.xml \
   && chgrp tomcat${TOMCAT_VERSION} /etc/tomcat${TOMCAT_VERSION}/hazelcast-client.xml \
-  && chmod 640 /etc/tomcat${TOMCAT_VERSION}/hazelcast-client.xml
+  && chmod 640 /etc/tomcat${TOMCAT_VERSION}/hazelcast-client.xml; fi
 
 # https://github.com/hazelcast/hazelcast-kubernetes
 ARG HAZELCAST_KUBERNETES_VERSION=1.0.0
@@ -196,16 +201,16 @@ RUN if [ ! -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then ( \
 fi
 
 # Add discovery configuration to hazelcast.xml.
-RUN if [ -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then \
-  sed -f /tmp/tmp_tomcat/hazelcast_join_discovery_memberlist.sed -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; \
-else \
+RUN if [ ! -z "$HAZELCAST_KUBERNETES_ENABLE" ]; then \
   sed -f /tmp/tmp_tomcat/hazelcast_join_discovery_kubernetes.sed -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; \
   sed 's#<property name="hazelcast.discovery.enabled">false</property>#<property name="hazelcast.discovery.enabled">true</property>#' -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; \
+elsif [ ! -z "$HAZELCAST_ENABLE" ] \
+  sed -f /tmp/tmp_tomcat/hazelcast_join_discovery_memberlist.sed -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; \
 fi
 
 # Replace membership list, if the membership file exists, otherwise leave
 # list at default.
-RUN if [ -z "$HAZELCAST_KUBERNETES_ENABLE" -a -f /tmp/tmp_tomcat/hazelcast_members.xml ]; then sed -f /tmp/tmp_tomcat/hazelcast_members.sed -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; fi
+RUN if [ ! -z "$HAZELCAST_ENABLE" -a -z "$HAZELCAST_KUBERNETES_ENABLE" -a -f /tmp/tmp_tomcat/hazelcast_members.xml ]; then sed -f /tmp/tmp_tomcat/hazelcast_members.sed -i /etc/tomcat${TOMCAT_VERSION}/hazelcast.xml; fi
 
 # Put the PostgreSQL JDBC jar in Tomcat's lib directory
 ARG POSTGRESQL_JDBC_VERSION=42.1.4
