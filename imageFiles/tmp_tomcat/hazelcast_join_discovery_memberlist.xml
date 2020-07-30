@@ -1,6 +1,0 @@
-            <tcp-ip enabled="true">
-                <!--<interface>127.0.0.1</interface>-->
-                <member-list>
-                    <member>127.0.0.1</member>
-                </member-list>
-            </tcp-ip>
