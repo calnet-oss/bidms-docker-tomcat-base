@@ -32,6 +32,7 @@ function container_startup {
   if [ -e /var/lib/tomcat9/cleanshutdown ]; then
     rm /var/lib/tomcat9/cleanshutdown
   fi
+  update_resolvconf
   /usr/sbin/syslogd
   
   CATALINA_HOME=/usr/share/tomcat9 \
@@ -57,4 +58,35 @@ function container_shutdown {
   ps -uxaw >> /var/lib/tomcat9/cleanshutdown
   rm /var/lib/tomcat9/shuttingdown
   exit
+}
+
+# Optionally rebuild /etc/resolv.conf at runtime if DNS_SEARCH and/or
+# DNS_NAMESERVERS variables are present in the environment.
+# /etc/resolv.conf is not touched if both of these environment variables are
+# not present.  DNS_NAMESERVERS AND DNS_SEARCH are both space delimited.
+function update_resolvconf {
+  RESULT=()
+  
+  if [ ! -z "$DNS_SEARCH" ]; then
+    RESULT+=("search $DNS_SEARCH")
+  fi
+  
+  if [ ! -z "$DNS_NAMESERVERS" ]; then
+    for i in $(echo $DNS_NAMESERVERS)
+    do
+      RESULT+=("nameserver $i")
+    done
+  fi
+  
+  if [ ${#RESULT[@]} -gt 0 ]; then
+    for i in "${!RESULT[@]}"; do
+      if [ $i -eq 0 ]; then
+        echo "${RESULT[$i]}" > /tmp/resolv.conf
+      else
+        echo "${RESULT[$i]}" >> /tmp/resolv.conf
+      fi
+    done
+    chown 644 /tmp/resolv.conf
+    mv /tmp/resolv.conf /etc
+  fi
 }
