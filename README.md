@@ -1,12 +1,11 @@
 ## Purpose
 
-This [Docker](http://www.docker.com/) image runs a
-[Tomcat](http://tomcat.apache.org/) application server and exposes several
-https ports that serve different groups of applications.  There's multiple
-ports for different web applications to allow for flexibility with firewall
-rules.
+This container image runs a [Tomcat](http://tomcat.apache.org/) application
+server and exposes several https ports that serve different groups of
+applications.  There's multiple ports for different web applications to
+allow for flexibility with firewall rules.
 
-The author does not currently publish the image in any public Docker
+The author does not currently publish the image in any public container
 repository but a script, described below, is provided to easily create your
 own image.
 
@@ -15,7 +14,7 @@ own image.
 The source code, which in this project is primarily shell scripts and the
 Dockerfile, is licensed under the [BSD two-clause license](LICENSE.txt).
 
-## Building the Docker image
+## Building the container image
 
 Copy `config.env.template` to `config.env` and edit to set config values.
 
@@ -50,7 +49,7 @@ Two files are generated:
 * `imageFiles/tmp_tomcat/tomcat.jks` - The Java keystore used by Tomcat.
 * `imageFiles/tmp_tomcat/tomcat_pubkey.pem` - Tomcat's TLS public key.
 
-This image depends on the the base BIDMS Debian Docker image from the
+This image depends on the the base BIDMS Debian container image from the
 [bidms-docker-debian-base](http://www.github.com/calnet-oss/bidms-docker-debian-base)
 project.  If you don't have that image built yet, you'll need that first.
 
@@ -64,9 +63,11 @@ Build the container image:
 ./buildImage.sh
 ```
 
-## Installing the Docker network bridge
+## Installing the container network bridge
 
-This container requires the `bidms_nw` [user-defined Docker network
+(`docker` commands can be replaced with `podman` if you prefer.)
+
+This container requires the `bidms_nw` [user-defined container network
 bridge](https://docs.docker.com/engine/userguide/networking/#bridge-networks)
 before running.  If you have not yet created this network bridge on your
 host (only needs to be done once), do so by running:
@@ -173,9 +174,10 @@ port.
 
 ## Tomcat File Persistence
 
-Docker will mount the host directory specified in `HOST_TOMCAT_DIRECTORY`
-from `config.env` within the container as `/var/lib/tomcat9` and this is how
-the application server run files are persisted across container runs.
+The container runtime will mount the host directory specified in
+`HOST_TOMCAT_DIRECTORY` from `config.env` within the container as
+`/var/lib/tomcat9` and this is how the application server run files are
+persisted across container runs.
 
 As mentioned in the build image step, the `buildImage.sh` script will
 initialize the Tomcat run files as long as the `HOST_TOMCAT_DIRECTORY`

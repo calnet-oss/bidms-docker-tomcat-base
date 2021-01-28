@@ -1,3 +1,9 @@
 #!/bin/sh
 
-docker exec -i -t bidms-tomcat /bin/bash 
+. ./config.env
+
+if [ -z "$RUNTIME_CMD" ]; then
+  RUNTIME_CMD=docker
+fi
+
+$RUNTIME_CMD exec -i -t bidms-tomcat /bin/bash 

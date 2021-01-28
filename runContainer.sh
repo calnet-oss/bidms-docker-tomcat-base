@@ -57,6 +57,11 @@ fi
 echo "Using config values from $CONFIG_FILE"
 . $CONFIG_FILE || check_exit
 
+if [ -z "$RUNTIME_CMD" ]; then
+  # Can be overriden in config.env to be podman instead.
+  RUNTIME_CMD=docker
+fi
+
 if [ ! -z "$NETWORK" ]; then
   echo "NETWORK=$NETWORK"
   NETWORKPARAMS+="--network $NETWORK "
@@ -112,7 +117,7 @@ if [[ -z "$NO_HOST_TOMCAT_DIRECTORY" && ! -z "$HOST_TOMCAT_DIRECTORY" ]]; then
 else
   # Docker will choose where it wants to put it on the host.
   # Use docker inspect bidms-tomcat to find out where.
-  echo "HOST_TOMCAT_DIRECTORY not set.  Using docker default."
+  echo "HOST_TOMCAT_DIRECTORY not set.  Using container default."
 fi
 
 if [[ -z "$NO_INTERACTIVE" && -z "$INTERACTIVE_PARAMS" ]]; then
@@ -130,7 +135,7 @@ fi
 # SYS_PTRACE capability necessary for /etc/init.d/tomcat script, which uses
 # start-stop-daemon, which needs /proc/<pid>/exe to match a PID with --exec,
 # and SYS_PTRACE needed for /proc/<pid>/exe.
-docker run $INTERACTIVE_PARAMS --rm --name "bidms-tomcat" \
+$RUNTIME_CMD run $INTERACTIVE_PARAMS --rm --name "bidms-tomcat" \
   $MOUNTPARAMS \
   $NETWORKPARAMS \
   -p $LOCAL_BIDMS_USER_FRONTEND_TOMCAT_PORT:8540 \
@@ -146,5 +151,5 @@ docker run $INTERACTIVE_PARAMS --rm --name "bidms-tomcat" \
   $ENTRYPOINT_ARGS || check_exit
 
 if [ ! -z "$NO_INTERACTIVE" ]; then
-  echo "Running in detached mode.  Stop the container with 'docker stop bidms-tomcat'."
+  echo "Running in detached mode.  Stop the container with '$RUNTIME_CMD stop bidms-tomcat'."
 fi

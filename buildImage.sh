@@ -45,6 +45,15 @@ the argument defaults in the Dockerfile will be used.
 EOF
 fi
 
+if [ -z "$BUILDTIME_CMD" ]; then
+  # Can be overriden in config.env to be buildah instead.
+  BUILDTIME_CMD=docker
+fi
+if [ -z "$RUNTIME_CMD" ]; then
+  # Can be overriden in config.env to be podman instead.
+  RUNTIME_CMD=docker
+fi
+
 if [ ! -f imageFiles/tmp_tomcat/tomcat.jks ]; then
   echo "imageFiles/tmp_tomcat/tomcat.jks is missing.  Run ./generateTLSCert.sh"
   exit 1
@@ -82,8 +91,14 @@ if [ ! -z "JNDI_DB_URL" ]; then
   ARGS+="--build-arg JNDI_DB_URL=$JNDI_DB_URL "
 fi
 
+if [ ! -z "$(echo \"$BUILDTIME_CMD\" | grep buildah)" ]; then
+  build_cmd="$BUILDTIME_CMD build-using-dockerfile"
+else
+  build_cmd="$BUILDTIME_CMD build"
+fi
+
 echo "Using ARGS: $ARGS"
-docker build $ARGS -t bidms/tomcat:tomcat9 imageFiles || check_exit
+$build_cmd $ARGS -t bidms/tomcat:tomcat9 imageFiles || check_exit
 
 #
 # We want to temporarily start up the image so we can copy the contents of
@@ -103,7 +118,7 @@ if [ ! -z "$HOST_TOMCAT_DIRECTORY" ]; then
   if [[ $? != 0 || -z "$TMP_TOMCAT_HOST_DIR" ]]; then
     echo "./getTomcatHostDir.sh failed"
     echo "Stopping the container."
-    docker stop bidms-tomcat
+    $RUNTIME_CMD stop bidms-tomcat
     exit 1
   fi
 
@@ -114,11 +129,11 @@ if [ ! -z "$HOST_TOMCAT_DIRECTORY" ]; then
   if [ $? != 0 ]; then
     echo "copy from $TMP_TOMCAT_HOST_DIR to $HOST_TOMCAT_DIRECTORY failed"
     echo "Stopping the container."
-    docker stop bidms-tomcat
+    $RUNTIME_CMD stop bidms-tomcat
     exit 1
   fi
   echo "Successfully copied to $HOST_TOMCAT_DIRECTORY"
   
   echo "Stopping the container."
-  docker stop bidms-tomcat || check_exit
+  $RUNTIME_CMD stop bidms-tomcat || check_exit
 fi
