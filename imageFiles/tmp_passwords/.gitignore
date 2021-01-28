@@ -4,3 +4,5 @@ hazelcast_group_pw
 hazelcast_enc_pw
 hazelcast_salt_pw
 bidms_db_registry_pw
+jmx.access
+jmx.password

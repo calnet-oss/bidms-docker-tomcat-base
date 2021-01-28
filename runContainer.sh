@@ -108,7 +108,7 @@ fi
 
 if [[ -z "$NO_HOST_TOMCAT_DIRECTORY" && ! -z "$HOST_TOMCAT_DIRECTORY" ]]; then
   echo "HOST_TOMCAT_DIRECTORY=$HOST_TOMCAT_DIRECTORY"
-  MOUNTPARAMS="-v $HOST_TOMCAT_DIRECTORY:/var/lib/tomcat8"
+  MOUNTPARAMS="-v $HOST_TOMCAT_DIRECTORY:/var/lib/tomcat9"
 else
   # Docker will choose where it wants to put it on the host.
   # Use docker inspect bidms-tomcat to find out where.
@@ -142,7 +142,7 @@ docker run $INTERACTIVE_PARAMS --rm --name "bidms-tomcat" \
   $OPTIONAL_PORT_OPTS \
   --cap-add=SYS_PTRACE \
   $* \
-  bidms/tomcat:latest \
+  bidms/tomcat:tomcat9 \
   $ENTRYPOINT_ARGS || check_exit
 
 if [ ! -z "$NO_INTERACTIVE" ]; then

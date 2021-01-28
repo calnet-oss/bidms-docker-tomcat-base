@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONTAINER_DIR="/var/lib/tomcat8"
+CONTAINER_DIR="/var/lib/tomcat9"
 INSPECT=$(docker inspect bidms-tomcat | sed -e '/Source/,/Destination/!d')
 
 while read -ra arr; do
