@@ -79,15 +79,15 @@ elif [ -e $HOME/.aptproxy ]; then
   ARGS+="--build-arg APT_PROXY_URL=$apt_proxy_url "
 fi
 
-if [ ! -z "JAVA_MEM_OPTS" ]; then
+if [ ! -z "$JAVA_MEM_OPTS" ]; then
   ARGS+="--build-arg JAVA_MEM_OPTS=$JAVA_MEM_OPTS "
 fi
 
-if [ ! -z "JAVA_DEBUG_OPTS" ]; then
+if [ ! -z "$JAVA_DEBUG_OPTS" ]; then
   ARGS+="--build-arg JAVA_DEBUG_OPTS=$JAVA_DEBUG_OPTS "
 fi
 
-if [ ! -z "JNDI_DB_URL" ]; then
+if [ ! -z "$JNDI_DB_URL" ]; then
   ARGS+="--build-arg JNDI_DB_URL=$JNDI_DB_URL "
 fi
 
