@@ -17,7 +17,7 @@
         <Context path="/manager" privileged="true" antiResourceLocking="false"
                  docBase="manager">
           <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-                 allow="127\.0\.0\.1|10\.244\.\d+\.\d+|192\.168\.5\.\d+|192\.168\.10\.\d+" />
+                 allow="127\.0\.0\.1|10\.244\.\d+\.\d+|192\.168\.5\.\d+|192\.168\.10\.\d+|10\.0\.2\.\d+" />
         </Context>
       </Host>
     </Engine>
@@ -50,7 +50,7 @@
         <Context path="/manager" privileged="true" antiResourceLocking="false"
                  docBase="manager">
           <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-                 allow="127\.0\.0\.1|10\.244\.\d+\.\d+|192\.168\.5\.\d+|192\.168\.10\.\d+" />
+                 allow="127\.0\.0\.1|10\.244\.\d+\.\d+|192\.168\.5\.\d+|192\.168\.10\.\d+|10\.0\.2\.\d+" />
         </Context>
       </Host>
     </Engine>
@@ -83,7 +83,7 @@
         <Context path="/manager" privileged="true" antiResourceLocking="false"
                  docBase="manager">
           <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-                 allow="127\.0\.0\.1|10\.244\.\d+\.\d+|192\.168\.5\.\d+|192\.168\.10\.\d+" />
+                 allow="127\.0\.0\.1|10\.244\.\d+\.\d+|192\.168\.5\.\d+|192\.168\.10\.\d+|10\.0\.2\.\d+" />
         </Context>
       </Host>
     </Engine>
@@ -116,7 +116,7 @@
         <Context path="/manager" privileged="true" antiResourceLocking="false"
                  docBase="manager">
           <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-                 allow="127\.0\.0\.1|10\.244\.\d+\.\d+|192\.168\.5\.\d+|192\.168\.10\.\d+" />
+                 allow="127\.0\.0\.1|10\.244\.\d+\.\d+|192\.168\.5\.\d+|192\.168\.10\.\d+|10\.0\.2\.\d+" />
         </Context>
       </Host>
     </Engine>
@@ -149,7 +149,7 @@
         <Context path="/manager" privileged="true" antiResourceLocking="false"
                  docBase="manager">
           <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-                 allow="127\.0\.0\.1|10\.244\.\d+\.\d+|192\.168\.5\.\d+|192\.168\.10\.\d+" />
+                 allow="127\.0\.0\.1|10\.244\.\d+\.\d+|192\.168\.5\.\d+|192\.168\.10\.\d+|10\.0\.2\.\d+" />
         </Context>
       </Host>
     </Engine>
