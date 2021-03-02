@@ -24,7 +24,10 @@ manager web UI application.  Also create the
 `imageFiles/tmp_passwords/tomcat_manager-script_pw` file and set a Tomcat
 manager-script password, which allows you to authenticate into the Tomcat
 manager web endpoint for deploying and undeploying applications via build
-tools like Gradle or by using a continuous integration system to deploy.
+tools like Gradle or by using a continuous integration system to deploy. 
+`imageFiles/tmp_passwords/tomcat_amq-admin_pw` is for authentication into
+the [ActiveMQ Web Console](https://github.com/calnet-oss/activemq-broker-and-webconsole-overlay-war),
+if it's deployed (if not, just set a dummy password for this).
 
 Make sure they are only readable by the owner:
 ```

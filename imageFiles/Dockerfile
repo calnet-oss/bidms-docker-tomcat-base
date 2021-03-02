@@ -58,15 +58,21 @@ RUN rm -rf /var/lib/tomcat${TOMCAT_VERSION}/logs /var/log/tomcat${TOMCAT_VERSION
 COPY tmp_passwords/ /tmp/tmp_passwords/
 COPY tmp_tomcat/ /tmp/tmp_tomcat/
 
-# Add tomcat manager and manager-script users.
+# Add tomcat manager, manager-script and amq-admin users.
 # manager is for the HTML GUI and manager-script is for deployment of apps.
-RUN sed -i 's/<\/tomcat-users>/  <role rolename="manager-gui"\/>\n  <role rolename="manager-script"\/>\n  <role rolename="manager-jmx"\/>\n  <role rolename="manager-status"\/>\n  <role rolename="admin-gui"\/>\n  <role rolename="admin-script"\/>\n/' /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
+# amq-admin is for the ActiveMQ Webconsole, if it's deployed.  The
+# activemq-broker-and-webconsole-overlay-war project uses "amq-admin" as the
+# role in its web.xml file.
+RUN sed -i 's/<\/tomcat-users>/  <role rolename="manager-gui"\/>\n  <role rolename="manager-script"\/>\n  <role rolename="manager-jmx"\/>\n  <role rolename="manager-status"\/>\n  <role rolename="admin-gui"\/>\n  <role rolename="admin-script"\/>\n  <role rolename="amq-admin"\/>\n/' /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
   && echo -n '  <user username="manager" password="' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
   && cat /tmp/tmp_passwords/tomcat_manager_pw >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
   && echo '" roles="manager-gui"/>' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
   && echo -n '  <user username="manager-script" password="' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
   && cat /tmp/tmp_passwords/tomcat_manager-script_pw >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
   && echo '" roles="manager-script"/>' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
+  && echo -n '  <user username="amq-admin" password="' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
+  && cat /tmp/tmp_passwords/tomcat_amq-admin_pw >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
+  && echo '" roles="amq-admin"/>' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml \
   && echo '</tomcat-users>' >> /etc/tomcat${TOMCAT_VERSION}/tomcat-users.xml
 
 # Copy the keystore for TLS
