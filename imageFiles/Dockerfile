@@ -24,7 +24,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
-FROM bidms/debian_base:buster
+FROM bidms/debian_base:bullseye
 
 ARG APT_PROXY_URL=
 RUN if [ ! -z "$APT_PROXY_URL" ]; then echo "Acquire::http::Proxy \"$APT_PROXY_URL\";" > /etc/apt/apt.conf.d/00aptproxy; else echo "not using apt proxy"; fi
@@ -37,6 +37,7 @@ RUN set -x \
   && apt-get dist-upgrade -y \
   && apt-get install -y tomcat${TOMCAT_VERSION} \
        tomcat${TOMCAT_VERSION}-admin \
+       openjdk-17-jdk-headless openjdk-11-jdk-headless- default-jre-headless- \
        telnet dnsutils git \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/*

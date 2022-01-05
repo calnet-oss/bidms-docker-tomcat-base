@@ -38,11 +38,13 @@ function container_startup {
   CATALINA_HOME=/usr/share/tomcat9 \
   CATALINA_BASE=/var/lib/tomcat9 \
   CATALINA_TMPDIR=/tmp \
+  JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 \
   /usr/libexec/tomcat9/tomcat-update-policy.sh \
     && sudo \
          CATALINA_HOME=/usr/share/tomcat9 \
          CATALINA_BASE=/var/lib/tomcat9 \
          CATALINA_TMPDIR=/tmp \
+         JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 \
          -u tomcat /usr/libexec/tomcat9/tomcat-start.sh &
 }
 
@@ -52,6 +54,7 @@ function container_shutdown {
     CATALINA_HOME=/usr/share/tomcat9 \
     CATALINA_BASE=/var/lib/tomcat9 \
     CATALINA_TMPDIR=/tmp \
+    JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 \
     -u tomcat /usr/share/tomcat9/bin/shutdown.sh
   kill -TERM $(cat /var/run/syslog.pid)
   echo "Processes still running after shutdown:" > /var/lib/tomcat9/cleanshutdown
