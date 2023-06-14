@@ -62,10 +62,10 @@ if [ -z "$RUNTIME_CMD" ]; then
   RUNTIME_CMD=docker
 fi
 
-if [ ! -z "$NETWORK" -a "$BUILDTIME_CMD" != "podman" ]; then
+if [ ! -z "$NETWORK" -a "$RUNTIME_CMD" != "podman" ]; then
   echo "NETWORK=$NETWORK"
   NETWORKPARAMS+="--network $NETWORK "
-else
+elif [ "$RUNTIME_CMD" != "podman" ]; then
   echo "ERROR: Required NETWORK value missing from $CONFIG_FILE"
   exit 1
 fi
