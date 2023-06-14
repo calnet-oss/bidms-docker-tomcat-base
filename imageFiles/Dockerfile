@@ -168,7 +168,7 @@ RUN sed -i 's#${catalina.base}/logs#${catalina.logdir}#' /etc/tomcat${TOMCAT_VER
 RUN sed -i 's#${catalina.base}${file.separator}logs#${catalina.logdir}#' /etc/tomcat${TOMCAT_VERSION}/policy.d/03catalina.policy
 
 # Put the PostgreSQL JDBC jar in Tomcat's lib directory
-ARG POSTGRESQL_JDBC_VERSION=42.5.4
+ARG POSTGRESQL_JDBC_VERSION=42.6.0
 COPY postgresql-${POSTGRESQL_JDBC_VERSION}.jar.md5 /tmp/
 RUN wget https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_JDBC_VERSION}.jar -O /usr/share/tomcat${TOMCAT_VERSION}/lib/postgresql-${POSTGRESQL_JDBC_VERSION}.jar \
       && test "$(md5sum /usr/share/tomcat${TOMCAT_VERSION}/lib/postgresql-${POSTGRESQL_JDBC_VERSION}.jar|cut -d' ' -f1)" = "$(cat /tmp/postgresql-${POSTGRESQL_JDBC_VERSION}.jar.md5|cut -d' ' -f1)"
