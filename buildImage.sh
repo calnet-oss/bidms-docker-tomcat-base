@@ -67,7 +67,7 @@ if [ ! -f imageFiles/tmp_tomcat/postgres_pubkey.pem ]; then
   exit 1
 fi
 
-if [ ! -z "$NETWORK" ]; then
+if [ ! -z "$NETWORK" -a "$BUILDTIME_CMD" != "buildah" ]; then
   echo "NETWORK=$NETWORK"
   ARGS+="--network $NETWORK "
 fi
@@ -98,11 +98,11 @@ else
 fi
 
 echo "Using ARGS: $ARGS"
-$build_cmd $ARGS -t bidms/tomcat:tomcat9 imageFiles || check_exit
+$build_cmd $ARGS -t bidms/tomcat:tomcat10 imageFiles || check_exit
 
 #
 # We want to temporarily start up the image so we can copy the contents of
-# /var/lib/tomcat9 to the host.  On subsequent container runs, we will
+# /var/lib/tomcat10 to the host.  On subsequent container runs, we will
 # mount this host directory into the container.  i.e., we want to persist
 # Tomcat data files across container runs.
 #
@@ -112,7 +112,7 @@ if [ ! -z "$HOST_TOMCAT_DIRECTORY" ]; then
     echo "If you want a clean install, delete $HOST_TOMCAT_DIRECTORY and re-run this script."
     exit
   fi
-  echo "Temporarily starting the container to copy /var/lib/tomcat9 to host"
+  echo "Temporarily starting the container to copy /var/lib/tomcat10 to host"
   NO_INTERACTIVE="true" NO_HOST_TOMCAT_DIRECTORY="true" ./runContainer.sh || check_exit
   TMP_TOMCAT_HOST_DIR=$(./getTomcatHostDir.sh)
   if [[ $? != 0 || -z "$TMP_TOMCAT_HOST_DIR" ]]; then

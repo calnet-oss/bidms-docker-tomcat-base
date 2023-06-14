@@ -62,7 +62,7 @@ if [ -z "$RUNTIME_CMD" ]; then
   RUNTIME_CMD=docker
 fi
 
-if [ ! -z "$NETWORK" ]; then
+if [ ! -z "$NETWORK" -a "$BUILDTIME_CMD" != "podman" ]; then
   echo "NETWORK=$NETWORK"
   NETWORKPARAMS+="--network $NETWORK "
 else
@@ -113,7 +113,7 @@ fi
 
 if [[ -z "$NO_HOST_TOMCAT_DIRECTORY" && ! -z "$HOST_TOMCAT_DIRECTORY" ]]; then
   echo "HOST_TOMCAT_DIRECTORY=$HOST_TOMCAT_DIRECTORY"
-  MOUNTPARAMS="-v $HOST_TOMCAT_DIRECTORY:/var/lib/tomcat9"
+  MOUNTPARAMS="-v $HOST_TOMCAT_DIRECTORY:/var/lib/tomcat10"
 else
   # Docker will choose where it wants to put it on the host.
   # Use docker inspect bidms-tomcat to find out where.
@@ -147,7 +147,7 @@ $RUNTIME_CMD run $INTERACTIVE_PARAMS --rm --name "bidms-tomcat" \
   $OPTIONAL_PORT_OPTS \
   --cap-add=SYS_PTRACE \
   $* \
-  bidms/tomcat:tomcat9 \
+  bidms/tomcat:tomcat10 \
   $ENTRYPOINT_ARGS || check_exit
 
 if [ ! -z "$NO_INTERACTIVE" ]; then

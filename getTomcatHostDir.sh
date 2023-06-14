@@ -6,7 +6,7 @@ if [ -z "$RUNTIME_CMD" ]; then
   RUNTIME_CMD=docker
 fi
 
-CONTAINER_DIR="/var/lib/tomcat9"
+CONTAINER_DIR="/var/lib/tomcat10"
 INSPECT=$($RUNTIME_CMD inspect bidms-tomcat | sed -e '/Source/,/Destination/!d')
 
 while read -ra arr; do

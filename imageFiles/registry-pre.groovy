@@ -13,12 +13,12 @@ else {
 }
 
 registry.config.overrides.locations = [
-  "file:/var/lib/tomcat9/bidms-config/registry-overrides.groovy",
-  "file:/var/lib/tomcat9/bidms-config/${appName}-overrides.groovy"
+  "file:/var/lib/tomcat10/bidms-config/registry-overrides.groovy",
+  "file:/var/lib/tomcat10/bidms-config/${appName}-overrides.groovy"
 ]
 registry.config.secrets.locations = [
-  "file:/var/lib/tomcat9/bidms-config/registry-secrets.groovy",
-  "file:/var/lib/tomcat9/bidms-config/${appName}-secrets.groovy"
+  "file:/var/lib/tomcat10/bidms-config/registry-secrets.groovy",
+  "file:/var/lib/tomcat10/bidms-config/${appName}-secrets.groovy"
 ]
 
 println "Done loading registry-pre.groovy"

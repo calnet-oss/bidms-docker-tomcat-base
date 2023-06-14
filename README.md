@@ -179,7 +179,7 @@ port.
 
 The container runtime will mount the host directory specified in
 `HOST_TOMCAT_DIRECTORY` from `config.env` within the container as
-`/var/lib/tomcat9` and this is how the application server run files are
+`/var/lib/tomcat10` and this is how the application server run files are
 persisted across container runs.
 
 As mentioned in the build image step, the `buildImage.sh` script will
